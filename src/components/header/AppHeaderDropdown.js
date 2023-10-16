@@ -2,12 +2,14 @@ import React from 'react'
 import {
   CAvatar,
   CBadge,
+  CContainer,
   CDropdown,
   CDropdownDivider,
   CDropdownHeader,
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
+  CRow,
 } from '@coreui/react'
 import {
   cilBell,
@@ -15,7 +17,7 @@ import {
   cilCommentSquare,
   cilEnvelopeOpen,
   cilFile,
-  cilLockLocked,
+  cilAccountLogout,
   cilSettings,
   cilTask,
   cilUser,
@@ -23,14 +25,40 @@ import {
 import CIcon from '@coreui/icons-react'
 
 import avatar8 from './../../assets/images/avatars/8.jpg'
+import useAuth from 'src/hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
+
+const ROLE_NAMES = {
+  1: 'Admin',
+  2: 'Designer',
+  3: 'Printer',
+  4: 'Packer',
+}
 
 const AppHeaderDropdown = () => {
+  const { auth, setAuth } = useAuth()
+  const userRole = ROLE_NAMES[auth.token_role_id] || ''
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    setAuth({})
+    alert('Successfuly logged out!')
+    navigate('/login', { replace: true })
+  }
+
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
         <CAvatar src={avatar8} size="md" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
+        <CContainer
+          className="d-flex flex-column align-items-center justify-content-center"
+          style={{ padding: '10px' }}
+        >
+          <CRow>Hello, {auth.token_username}!</CRow>
+          <CRow>{userRole}</CRow>
+        </CContainer>
         <CDropdownHeader className="bg-light fw-semibold py-2">Account</CDropdownHeader>
         <CDropdownItem href="#">
           <CIcon icon={cilBell} className="me-2" />
@@ -84,9 +112,9 @@ const AppHeaderDropdown = () => {
           </CBadge>
         </CDropdownItem>
         <CDropdownDivider />
-        <CDropdownItem href="#">
-          <CIcon icon={cilLockLocked} className="me-2" />
-          Lock Account
+        <CDropdownItem onClick={() => handleLogout()} style={{ cursor: 'pointer' }}>
+          <CIcon icon={cilAccountLogout} className="me-2" />
+          Logout
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>

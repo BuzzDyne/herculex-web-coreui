@@ -1,0 +1,6 @@
+{
+  "editor.tabSize": 2, // Should match your Prettier tab width
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  // Other workspace-specific settings
+}
