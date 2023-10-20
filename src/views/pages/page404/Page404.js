@@ -6,7 +6,6 @@ const Page404 = () => {
   const navigate = useNavigate()
 
   const handleNavigateToHome = async () => {
-    alert('testt!')
     navigate('/', { replace: true })
   }
 

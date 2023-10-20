@@ -13,6 +13,7 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
+  CSpinner,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
@@ -31,6 +32,7 @@ const Login = () => {
   const [username, setUsername] = useState('')
   const [pwd, setPwd] = useState('')
   const [errMsg, setErrMsg] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setErrMsg('')
@@ -38,6 +40,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
 
     try {
       const response = await axios.post(LOGIN_URL, JSON.stringify({ username, password: pwd }), {
@@ -70,6 +73,8 @@ const Login = () => {
         setErrMsg('Something went wrong...')
         console.log(err)
       }
+    } finally {
+      setLoading(false) // Set loading back to false when the request completes
     }
   }
 
@@ -139,9 +144,21 @@ const Login = () => {
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
-                        <CButton color="primary" className="px-4" onClick={handleSubmit}>
-                          Login
-                        </CButton>
+                        {loading ? ( // Conditionally render the spinner while loading
+                          <CButton disabled>
+                            <CSpinner
+                              component="span"
+                              size="sm"
+                              aria-hidden="true"
+                              style={{ marginRight: '8px' }}
+                            />
+                            Loading...
+                          </CButton>
+                        ) : (
+                          <CButton color="primary" className="px-4" onClick={handleSubmit}>
+                            Login
+                          </CButton>
+                        )}
                       </CCol>
                     </CRow>
                   </CForm>
