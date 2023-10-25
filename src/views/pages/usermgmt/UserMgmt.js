@@ -22,11 +22,14 @@ import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 import CIcon from '@coreui/icons-react'
 import UserCreateModal from '../../modals/UserCreateModal'
 import UserDeleteModal from '../../modals/UserDeleteModal'
+import UserEditModal from '../../modals/UserEditModal'
 
 const UserMgmt = () => {
   const [userList, setUserList] = useState([])
   const [isUserCreateModalVisible, setIsUserCreateModalVisible] = useState(false)
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false)
+  const [userToEdit, setUserToEdit] = useState({})
   const [userToDelete, setUserToDelete] = useState({
     id: null,
     username: '',
@@ -60,9 +63,9 @@ const UserMgmt = () => {
   }, [])
 
   // Function to handle edit button click
-  const handleEditClick = (userId) => {
-    // Implement your edit functionality here
-    console.log('Edit user with ID:', userId)
+  const handleEditClick = (userData) => {
+    setUserToEdit(userData)
+    setIsEditModalVisible(true)
   }
 
   // Function to handle delete button click
@@ -164,7 +167,7 @@ const UserMgmt = () => {
                             </CTableDataCell>
                             <CTableDataCell className="text-center">
                               <CButtonGroup role="group" aria-label="Basic example">
-                                <CButton color="warning" onClick={() => handleEditClick(user.id)}>
+                                <CButton color="warning" onClick={() => handleEditClick(user)}>
                                   <CIcon icon={cilPencil} />
                                 </CButton>
                                 <CButton
@@ -199,7 +202,15 @@ const UserMgmt = () => {
         isOpen={isDeleteModalVisible}
         onClose={() => {
           setIsDeleteModalVisible(false)
-          // Optionally, you can re-fetch the user list after the deletion
+          fetchData()
+        }}
+      />
+
+      <UserEditModal
+        userData={userToEdit}
+        isOpen={isEditModalVisible}
+        onClose={() => {
+          setIsEditModalVisible(false)
           fetchData()
         }}
       />

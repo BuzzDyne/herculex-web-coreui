@@ -42,7 +42,6 @@ const AppHeaderDropdown = () => {
 
   const handleLogout = async () => {
     setAuth({})
-    alert('Successfuly logged out!')
     navigate('/login', { replace: true })
   }
 
