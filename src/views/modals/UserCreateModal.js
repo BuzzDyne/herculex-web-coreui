@@ -149,18 +149,23 @@ const UserCreateModal = ({ isOpen, onClose }) => {
     }
 
     // If all fields pass validation, make the API call to submit the data
-    try {
-      await axiosPrivate.post('/auth/signup', {
+    axiosPrivate
+      .post('/auth/signup', {
         username: formUsernameValue,
         password: formPwdValue,
         rolename: formRoleValue,
       })
-    } catch (err) {
-      console.log(err)
-      setFormSubmitErrorMsg(err)
-      return
-    }
-    closeSelf()
+      .then((response) => {
+        setIsLoading(false)
+        closeSelf()
+      })
+      .catch((err) => {
+        const errorMessage = err.response?.data?.detail ?? err.message
+        setFormSubmitErrorMsg(errorMessage)
+        console.error('Error signing up user', err)
+        setIsLoading(false)
+        return
+      })
   }
 
   return (
@@ -174,13 +179,7 @@ const UserCreateModal = ({ isOpen, onClose }) => {
         <CModalTitle id="VerticallyCenteredExample">Create New User</CModalTitle>
       </CModalHeader>
       <CModalBody>
-        {formSubmitErrorMsg && (
-          <CAlert color="danger">
-            Something went wrong!
-            <br />
-            {formSubmitErrorMsg}
-          </CAlert>
-        )}
+        {formSubmitErrorMsg && <CAlert color="danger">{formSubmitErrorMsg}</CAlert>}
 
         <CForm className="row g-3">
           <CCol md={6}>
