@@ -27,13 +27,7 @@ import CIcon from '@coreui/icons-react'
 import avatar8 from './../../assets/images/avatars/8.jpg'
 import useAuth from 'src/hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
-
-const ROLE_NAMES = {
-  1: 'Admin',
-  2: 'Designer',
-  3: 'Printer',
-  4: 'Packer',
-}
+import { ROLE_NAMES } from 'src/constant'
 
 const AppHeaderDropdown = () => {
   const { auth, setAuth } = useAuth()

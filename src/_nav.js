@@ -16,7 +16,46 @@ import {
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
-const _nav = [
+export const nav_designer = [
+  {
+    component: CNavTitle,
+    name: 'Designer',
+  },
+  {
+    component: CNavItem,
+    name: 'Dashboard',
+    to: '/dashboard',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+  },
+]
+
+export const nav_printer = [
+  {
+    component: CNavTitle,
+    name: 'Printer',
+  },
+  {
+    component: CNavItem,
+    name: 'Dashboard',
+    to: '/dashboard',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+  },
+]
+
+export const nav_packer = [
+  {
+    component: CNavTitle,
+    name: 'Packer',
+  },
+  {
+    component: CNavItem,
+    name: 'Dashboard',
+    to: '/dashboard',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+  },
+]
+
+export const nav_default = [
   {
     component: CNavItem,
     name: 'Dashboard',
@@ -312,5 +351,3 @@ const _nav = [
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
 ]
-
-export default _nav

@@ -40,7 +40,6 @@ const UserMgmt = () => {
   const axiosPrivate = useAxiosPrivate()
 
   const fetchData = () => {
-    console.log('fetchData start')
     setIsLoading(true)
     axiosPrivate
       .get('/api_user/get_list')
@@ -55,7 +54,6 @@ const UserMgmt = () => {
         setUserList([])
         setIsLoading(false)
       })
-    console.log('fetchData end')
   }
 
   useEffect(() => {
