@@ -29,7 +29,8 @@ import { useParams } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 import { INTERNAL_ORDER_STATUS } from '../../../constant'
-import OrderInitialDataCreate from 'src/views/modals/OrderInitialDataCreate'
+import OrderInitialDataCreate from '../../../views/modals/OrderInitialDataCreate'
+import OrderInitialDataEdit from '../../../views/modals/OrderInitialDataEdit'
 
 const OrderListAdmin = () => {
   const filterOptions = [
@@ -52,7 +53,9 @@ const OrderListAdmin = () => {
   const [axiosErrMsg, setAxiosErrMsg] = useState('')
 
   const [isInitialCreateModalVisible, setIsInitialCreateModalVisible] = useState(false)
+  const [isInitialEditModalVisible, setIsInitialEditModalVisible] = useState(false)
   const [selectedOrderID, setSelectedOrderID] = useState('')
+  const [selectedOrderData, setSelectedOrderData] = useState({})
 
   const axiosPrivate = useAxiosPrivate()
 
@@ -118,8 +121,9 @@ const OrderListAdmin = () => {
     const minutes = Math.floor(timeDifference / (1000 * 60))
     const hours = Math.floor(timeDifference / (1000 * 60 * 60))
     const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24))
-
-    if (minutes < 60) {
+    if (minutes < 2) {
+      return `Just now`
+    } else if (minutes < 60) {
       return `${minutes}m ago`
     } else if (hours < 24) {
       return `${hours}h ago`
@@ -140,6 +144,11 @@ const OrderListAdmin = () => {
   const openOrderInitialDataCreateModal = (orderID) => {
     setSelectedOrderID(orderID)
     setIsInitialCreateModalVisible(true)
+  }
+
+  const openOrderInitialDataEditModal = (orderData) => {
+    setSelectedOrderData(orderData)
+    setIsInitialEditModalVisible(true)
   }
 
   return (
@@ -233,7 +242,15 @@ const OrderListAdmin = () => {
                           {getEcomName(data.order.ecommerce_code)}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {data.order.user_deadline_prd || '-'}
+                          {data.order.user_deadline_prd
+                            ? `${data.order.user_deadline_prd.slice(
+                                0,
+                                4,
+                              )}/${data.order.user_deadline_prd.slice(
+                                4,
+                                6,
+                              )}/${data.order.user_deadline_prd.slice(6)}`
+                            : '-'}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {getStatusBadge(data.order.internal_status_id)}
@@ -245,16 +262,26 @@ const OrderListAdmin = () => {
                           {formatTStoPrettyString(data.order.last_updated_ts)}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CDropdown>
+                          <CDropdown style={{ cursor: 'pointer' }}>
                             <CDropdownToggle color="light" />
                             <CDropdownMenu>
-                              <CDropdownItem
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => openOrderInitialDataCreateModal(data.order.id)}
-                              >
-                                Input Initial Data
-                              </CDropdownItem>
-                              <CDropdownItem style={{ cursor: 'pointer' }}>Set PIC</CDropdownItem>
+                              <CDropdownItem>Set PIC</CDropdownItem>
+                              <CDropdownDivider />
+                              {data.order.user_deadline_prd ? (
+                                // Render this menu if user_deadline_prd is not null or empty
+                                <CDropdownItem
+                                  onClick={() => openOrderInitialDataEditModal(data.order)}
+                                >
+                                  Edit Initial Data
+                                </CDropdownItem>
+                              ) : (
+                                // Render this menu if user_deadline_prd is null or empty
+                                <CDropdownItem
+                                  onClick={() => openOrderInitialDataCreateModal(data.order.id)}
+                                >
+                                  Input Initial Data
+                                </CDropdownItem>
+                              )}
                             </CDropdownMenu>
                           </CDropdown>
                         </CTableDataCell>
@@ -274,6 +301,14 @@ const OrderListAdmin = () => {
           fetchData()
         }}
         orderID={selectedOrderID}
+      />
+      <OrderInitialDataEdit
+        isOpen={isInitialEditModalVisible}
+        onClose={() => {
+          setIsInitialEditModalVisible(false)
+          fetchData()
+        }}
+        orderData={selectedOrderData}
       />
     </>
   )
