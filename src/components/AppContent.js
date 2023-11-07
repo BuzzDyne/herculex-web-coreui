@@ -6,19 +6,16 @@ import useAuth from '../hooks/useAuth'
 // routes config
 import routes from '../routes'
 
-const ProtectedRoute = ({ element: Element }) => {
+const ProtectedRoute = ({ element: Element, isPrivate, ...rest }) => {
   const { auth } = useAuth()
-  const location = useLocation()
 
   const isAuthenticated = () => !!auth?.token_username
 
-  if (!isAuthenticated()) {
-    // Redirect to the login page if the user is not authenticated
-    return <Navigate to="/login" state={{ from: location.pathname }} replace={true} />
+  if (isPrivate && !isAuthenticated()) {
+    return <Navigate to="/login" />
   }
 
-  // Render the protected route's element if authenticated
-  return <Element />
+  return <Element {...rest} />
 }
 
 const AppContent = () => {
@@ -34,13 +31,12 @@ const AppContent = () => {
                   path={route.path}
                   exact={route.exact}
                   name={route.name}
-                  element={<ProtectedRoute element={route.element} />}
+                  element={<ProtectedRoute element={route.element} isPrivate={route.isPrivate} />}
                 />
               )
             )
           })}
           <Route path="/" element={<Navigate to="dashboard" replace />} />
-          {/* Catch-all route for unmatched routes */}
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
       </Suspense>
