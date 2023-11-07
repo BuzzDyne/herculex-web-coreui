@@ -24,11 +24,12 @@ import {
   CTableRow,
   CTooltip,
 } from '@coreui/react'
-import { cilPlus, cilPencil } from '@coreui/icons'
+import { cilPlus } from '@coreui/icons'
 import { useParams } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 import { INTERNAL_ORDER_STATUS } from '../../../constant'
+import OrderInitialDataCreate from 'src/views/modals/OrderInitialDataCreate'
 
 const OrderListAdmin = () => {
   const filterOptions = [
@@ -49,6 +50,9 @@ const OrderListAdmin = () => {
 
   const [isLoading, setIsLoading] = useState(false)
   const [axiosErrMsg, setAxiosErrMsg] = useState('')
+
+  const [isInitialCreateModalVisible, setIsInitialCreateModalVisible] = useState(false)
+  const [selectedOrderID, setSelectedOrderID] = useState('')
 
   const axiosPrivate = useAxiosPrivate()
 
@@ -104,7 +108,7 @@ const OrderListAdmin = () => {
     }
   }
 
-  const formatTimestamp = (timestamp) => {
+  const formatTStoPrettyString = (timestamp) => {
     if (timestamp === null) {
       return '-'
     }
@@ -131,6 +135,11 @@ const OrderListAdmin = () => {
       setIsLoading(true)
       setSelectedFilter(filter)
     }
+  }
+
+  const openOrderInitialDataCreateModal = (orderID) => {
+    setSelectedOrderID(orderID)
+    setIsInitialCreateModalVisible(true)
   }
 
   return (
@@ -170,7 +179,7 @@ const OrderListAdmin = () => {
               </CButtonGroup>
             </CCol>
             <CCol xs="2" className="text-end">
-              <CButton color="success">
+              <CButton color="success" disabled>
                 <CIcon icon={cilPlus} />
               </CButton>
             </CCol>
@@ -188,14 +197,7 @@ const OrderListAdmin = () => {
               </CCol>
             ) : (
               <CCol xs="12">
-                <CTable
-                  style={{ minHeight: '200px' }}
-                  striped
-                  small
-                  hover
-                  responsive
-                  align="middle"
-                >
+                <CTable style={{ minHeight: '200px' }} small hover responsive align="middle">
                   <CTableHead>
                     <CTableRow>
                       <CTableHeaderCell className="text-center" scope="col">
@@ -240,13 +242,16 @@ const OrderListAdmin = () => {
                           {data.pic_username || '-'}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {formatTimestamp(data.order.last_updated_ts)}
+                          {formatTStoPrettyString(data.order.last_updated_ts)}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <CDropdown>
-                            <CDropdownToggle color="secondary" />
+                            <CDropdownToggle color="light" />
                             <CDropdownMenu>
-                              <CDropdownItem style={{ cursor: 'pointer' }}>
+                              <CDropdownItem
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => openOrderInitialDataCreateModal(data.order.id)}
+                              >
                                 Input Initial Data
                               </CDropdownItem>
                               <CDropdownItem style={{ cursor: 'pointer' }}>Set PIC</CDropdownItem>
@@ -262,6 +267,14 @@ const OrderListAdmin = () => {
           </CRow>
         </CCardBody>
       </CCard>
+      <OrderInitialDataCreate
+        isOpen={isInitialCreateModalVisible}
+        onClose={() => {
+          setIsInitialCreateModalVisible(false)
+          fetchData()
+        }}
+        orderID={selectedOrderID}
+      />
     </>
   )
 }
