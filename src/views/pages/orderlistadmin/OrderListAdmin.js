@@ -25,15 +25,18 @@ import {
   CTooltip,
 } from '@coreui/react'
 import { cilPlus } from '@coreui/icons'
-import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 import { INTERNAL_ORDER_STATUS } from '../../../constant'
 import OrderInitialDataCreate from '../../../views/modals/OrderInitialDataCreate'
 import OrderInitialDataEdit from '../../../views/modals/OrderInitialDataEdit'
 import OrderPICManage from '../../../views/modals/OrderPICManage'
+import { formatTStoPrettyString, getEcomName, getStatusBadge } from 'src/utils'
 
 const OrderListAdmin = () => {
+  const navigate = useNavigate()
+
   const filterOptions = [
     { name: 'All Orders', api_path: '/api_order/get_all_orders' },
     { name: 'Last 3 Month', api_path: '/api_order/last_3_months' },
@@ -46,7 +49,6 @@ const OrderListAdmin = () => {
     { name: 'Complete', api_path: '/api_order/get_orders_by_status?status=999' },
   ]
 
-  const { id } = useParams()
   const [orderListAdmin, setOrderListAdmin] = useState([])
   const [selectedFilter, setSelectedFilter] = useState(filterOptions[1])
 
@@ -83,64 +85,16 @@ const OrderListAdmin = () => {
     fetchData()
   }, [selectedFilter])
 
-  const getEcomName = (ecommerce_code) => {
-    switch (ecommerce_code) {
-      case 'T':
-        return 'Tokopedia'
-      case 'S':
-        return 'Shopee'
-      default:
-        return ecommerce_code
-    }
-  }
-
-  const getStatusBadge = (internal_order_status) => {
-    const statusInfo = INTERNAL_ORDER_STATUS[internal_order_status]
-
-    if (statusInfo) {
-      const { name, colorname } = statusInfo
-      return (
-        <CBadge size="lg" color={colorname}>
-          {name}
-        </CBadge>
-      )
-    } else {
-      return (
-        <CBadge size="lg" color="secondary">
-          Unknown
-        </CBadge>
-      )
-    }
-  }
-
-  const formatTStoPrettyString = (timestamp) => {
-    if (timestamp === null) {
-      return '-'
-    }
-    const now = new Date(Date.now())
-    const tsDate = new Date(timestamp)
-    const timeDifference = now - tsDate
-    const minutes = Math.floor(timeDifference / (1000 * 60))
-    const hours = Math.floor(timeDifference / (1000 * 60 * 60))
-    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24))
-    if (minutes < 2) {
-      return `Just now`
-    } else if (minutes < 60) {
-      return `${minutes}m ago`
-    } else if (hours < 24) {
-      return `${hours}h ago`
-    } else if (days < 30) {
-      return `${days}d ago`
-    } else {
-      return '>1 month ago'
-    }
-  }
-
   const handleFilterChange = (filter) => {
     if (filter.name !== selectedFilter.name) {
       setIsLoading(true)
       setSelectedFilter(filter)
     }
+  }
+
+  const handleGoToOrderDetail = (orderId) => {
+    // Use the navigate function to redirect to the order_detail route with the order ID
+    navigate(`/order_detail/${orderId}`)
   }
 
   const openOrderInitialDataCreateModal = (orderID) => {
@@ -243,7 +197,16 @@ const OrderListAdmin = () => {
                     {orderListAdmin.map((data) => (
                       <CTableRow key={data.order.id}>
                         <CTableHeaderCell className="text-center" scope="row">
-                          {data.order.id}
+                          <span
+                            onClick={() => handleGoToOrderDetail(data.order.id)}
+                            style={{
+                              cursor: 'pointer',
+                              color: 'blue',
+                              textDecoration: 'underline',
+                            }}
+                          >
+                            {data.order.id}
+                          </span>
                         </CTableHeaderCell>
                         <CTableDataCell className="text-center">
                           {getEcomName(data.order.ecommerce_code)}
