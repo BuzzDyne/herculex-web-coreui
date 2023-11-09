@@ -31,6 +31,7 @@ import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 import { INTERNAL_ORDER_STATUS } from '../../../constant'
 import OrderInitialDataCreate from '../../../views/modals/OrderInitialDataCreate'
 import OrderInitialDataEdit from '../../../views/modals/OrderInitialDataEdit'
+import OrderPICManage from '../../../views/modals/OrderPICManage'
 
 const OrderListAdmin = () => {
   const filterOptions = [
@@ -54,6 +55,7 @@ const OrderListAdmin = () => {
 
   const [isInitialCreateModalVisible, setIsInitialCreateModalVisible] = useState(false)
   const [isInitialEditModalVisible, setIsInitialEditModalVisible] = useState(false)
+  const [isPICModalVisible, setIsPICModalVisible] = useState(false)
   const [selectedOrderID, setSelectedOrderID] = useState('')
   const [selectedOrderData, setSelectedOrderData] = useState({})
 
@@ -149,6 +151,11 @@ const OrderListAdmin = () => {
   const openOrderInitialDataEditModal = (orderData) => {
     setSelectedOrderData(orderData)
     setIsInitialEditModalVisible(true)
+  }
+
+  const openPICModal = (orderData) => {
+    setSelectedOrderData(orderData)
+    setIsPICModalVisible(true)
   }
 
   return (
@@ -265,7 +272,9 @@ const OrderListAdmin = () => {
                           <CDropdown style={{ cursor: 'pointer' }}>
                             <CDropdownToggle color="light" />
                             <CDropdownMenu>
-                              <CDropdownItem>Set PIC</CDropdownItem>
+                              <CDropdownItem onClick={() => openPICModal(data.order)}>
+                                Set PIC
+                              </CDropdownItem>
                               <CDropdownDivider />
                               {data.order.user_deadline_prd ? (
                                 // Render this menu if user_deadline_prd is not null or empty
@@ -306,6 +315,14 @@ const OrderListAdmin = () => {
         isOpen={isInitialEditModalVisible}
         onClose={() => {
           setIsInitialEditModalVisible(false)
+          fetchData()
+        }}
+        orderData={selectedOrderData}
+      />
+      <OrderPICManage
+        isOpen={isPICModalVisible}
+        onClose={() => {
+          setIsPICModalVisible(false)
           fetchData()
         }}
         orderData={selectedOrderData}

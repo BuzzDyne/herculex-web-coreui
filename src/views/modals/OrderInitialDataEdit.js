@@ -37,17 +37,18 @@ const OrderInitialDataEdit = ({ isOpen, onClose, orderData }) => {
   const axiosPrivate = useAxiosPrivate()
 
   useEffect(() => {
-    setFormCustPhoneValue(orderData.cust_phone_no)
+    if (isOpen && orderData) {
+      setFormCustPhoneValue(orderData.cust_phone_no)
 
-    const year = orderData.user_deadline_prd.substr(0, 4)
-    const month = orderData.user_deadline_prd.substr(4, 2)
-    const day = orderData.user_deadline_prd.substr(6, 2)
+      const year = orderData.user_deadline_prd?.substr(0, 4)
+      const month = orderData.user_deadline_prd?.substr(4, 2)
+      const day = orderData.user_deadline_prd?.substr(6, 2)
 
-    setFormYYYYValue(year)
-    setFormMMValue(month)
-    setFormDDValue(day)
-  }, [isOpen])
-
+      setFormYYYYValue(year)
+      setFormMMValue(month)
+      setFormDDValue(day)
+    }
+  }, [isOpen, orderData])
   const handleCustPhoneChange = (e) => {
     const phone = e.target.value
 
