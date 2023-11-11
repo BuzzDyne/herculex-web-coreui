@@ -19,8 +19,14 @@ import { useNavigate } from 'react-router-dom'
 import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
 import { formatTStoPrettyString, getEcomName, getStatusBadge } from 'src/utils'
 
-const OrderBacklogList = (props) => {
-  //props.api_path
+const OrderBacklogList = ({
+  api_path,
+  isAdmin,
+  refreshDataFlag,
+  openPICModal,
+  openOrderInitialDataCreateModal,
+  openPICToMeModal,
+}) => {
   const navigate = useNavigate()
 
   const [orderList, setOrderList] = useState([])
@@ -28,11 +34,7 @@ const OrderBacklogList = (props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [axiosErrMsg, setAxiosErrMsg] = useState('')
 
-  const [isInitialCreateModalVisible, setIsInitialCreateModalVisible] = useState(false)
   const [isInitialEditModalVisible, setIsInitialEditModalVisible] = useState(false)
-  const [isPICModalVisible, setIsPICModalVisible] = useState(false)
-  const [selectedOrderID, setSelectedOrderID] = useState('')
-  const [selectedOrderData, setSelectedOrderData] = useState({})
 
   const axiosPrivate = useAxiosPrivate()
 
@@ -40,9 +42,9 @@ const OrderBacklogList = (props) => {
     setIsLoading(true)
     setAxiosErrMsg('')
     axiosPrivate
-      .get(props.api_path)
+      .get(api_path)
       .then((response) => {
-        console.log(props.api_path, ':', response.data)
+        console.log(api_path, ':', response.data)
         setOrderList(response.data)
         setIsLoading(false)
       })
@@ -56,25 +58,15 @@ const OrderBacklogList = (props) => {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [refreshDataFlag])
 
   const handleGoToOrderDetail = (orderId) => {
     navigate(`/order_detail/${orderId}`)
   }
 
-  const openOrderInitialDataCreateModal = (orderID) => {
-    setSelectedOrderID(orderID)
-    setIsInitialCreateModalVisible(true)
-  }
-
   const openOrderInitialDataEditModal = (orderData) => {
     setSelectedOrderData(orderData)
     setIsInitialEditModalVisible(true)
-  }
-
-  const openPICModal = (orderData) => {
-    setSelectedOrderData(orderData)
-    setIsPICModalVisible(true)
   }
 
   return (
@@ -161,21 +153,25 @@ const OrderBacklogList = (props) => {
                     <CDropdown style={{ cursor: 'pointer' }}>
                       <CDropdownToggle color="light" />
                       <CDropdownMenu>
-                        <CDropdownItem onClick={() => openPICModal(data.order)}>
-                          Set PIC
-                        </CDropdownItem>
-                        <CDropdownDivider />
-                        {data.order.user_deadline_prd ? (
-                          // Render this menu if user_deadline_prd is not null or empty
-                          <CDropdownItem onClick={() => openOrderInitialDataEditModal(data.order)}>
-                            Edit Initial Data
-                          </CDropdownItem>
+                        {isAdmin ? (
+                          <>
+                            <CDropdownItem onClick={() => openPICModal(data.order)}>
+                              Set PIC
+                            </CDropdownItem>
+                            {data.order.internal_status_id === '000' && (
+                              <>
+                                <CDropdownDivider />
+                                <CDropdownItem
+                                  onClick={() => openOrderInitialDataCreateModal(data.order.id)}
+                                >
+                                  Input Initial Data
+                                </CDropdownItem>
+                              </>
+                            )}
+                          </>
                         ) : (
-                          // Render this menu if user_deadline_prd is null or empty
-                          <CDropdownItem
-                            onClick={() => openOrderInitialDataCreateModal(data.order.id)}
-                          >
-                            Input Initial Data
+                          <CDropdownItem onClick={() => openPICToMeModal(data.order)}>
+                            Assign to me
                           </CDropdownItem>
                         )}
                       </CDropdownMenu>

@@ -9,44 +9,67 @@ import {
   CCol,
   CRow,
 } from '@coreui/react'
-import React from 'react'
+import React, { useState } from 'react'
 import OrderBacklogList from 'src/components/OrderBacklogList'
+import OrderPICManage from '../modals/OrderPICManage'
+import OrderInitialDataCreate from '../modals/OrderInitialDataCreate'
+import OrderPICToMe from '../modals/OrderPICToMe'
 
 const data = [
   {
     id: 1,
-    imageUrl: 'https://placehold.co/400',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 1',
     text: 'Some quick example text for Card 1',
   },
   {
     id: 2,
-    imageUrl: 'https://placehold.co/180x200',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 2',
     text: 'Some quick example text for Card 2',
   },
   {
     id: 3,
-    imageUrl: 'https://placehold.co/150x180',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 3',
     text: 'Some quick example text for Card 3',
   },
   {
     id: 4,
-    imageUrl: 'https://placehold.co/180x100',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 4',
     text: 'Some quick example text for Card 4',
   },
   {
     id: 5,
-    imageUrl: 'https://placehold.co/400x360',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 5',
     text: 'Some quick example text for Card 5',
   },
-  // Add more data as needed
 ]
 
 function DashboardAdmin() {
+  const [refreshDataFlag, setRefreshDataFlag] = useState(false)
+
+  const toggleRefreshDataFlag = () => {
+    setRefreshDataFlag((prevFlag) => !prevFlag)
+  }
+
+  // Modals
+  const [selectedOrderData, setSelectedOrderData] = useState({})
+  const [isPICModalVisible, setIsPICModalVisible] = useState(false)
+  const openPICModal = (orderData) => {
+    setSelectedOrderData(orderData)
+    setIsPICModalVisible(true)
+  }
+
+  const [selectedOrderID, setSelectedOrderID] = useState('')
+  const [isInitialCreateModalVisible, setIsInitialCreateModalVisible] = useState(false)
+  const openOrderInitialDataCreateModal = (orderID) => {
+    setSelectedOrderID(orderID)
+    setIsInitialCreateModalVisible(true)
+  }
+
   return (
     <>
       <CCard className="text-center mb-4">
@@ -60,7 +83,7 @@ function DashboardAdmin() {
                 <CCard>
                   <CCardImage orientation="top" src={card.imageUrl} />
                   <CCardBody className="p-2">
-                    <CCardTitle>Order #123</CCardTitle>
+                    <CCardTitle>Order #{card.id}</CCardTitle>
                     <CCardText>{card.text}</CCardText>
                     <CButton href="#" size="sm">
                       Submit Design
@@ -81,9 +104,32 @@ function DashboardAdmin() {
           <h5 className="mb-0">Task List (Admin)</h5>
         </CCardHeader>
         <CCardBody>
-          <OrderBacklogList api_path="/api_order/get_orders_by_status?status=admin" />
+          <OrderBacklogList
+            api_path="/api_order/get_orders_by_status?status=admin"
+            isAdmin={true}
+            refreshDataFlag={refreshDataFlag}
+            openPICModal={openPICModal}
+            openOrderInitialDataCreateModal={openOrderInitialDataCreateModal}
+          />
         </CCardBody>
       </CCard>
+
+      <OrderPICManage
+        isOpen={isPICModalVisible}
+        onClose={() => {
+          setIsPICModalVisible(false)
+          toggleRefreshDataFlag()
+        }}
+        orderData={selectedOrderData}
+      />
+      <OrderInitialDataCreate
+        isOpen={isInitialCreateModalVisible}
+        onClose={() => {
+          setIsInitialCreateModalVisible(false)
+          toggleRefreshDataFlag()
+        }}
+        orderID={selectedOrderID}
+      />
     </>
   )
 }

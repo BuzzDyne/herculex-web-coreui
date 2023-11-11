@@ -9,37 +9,38 @@ import {
   CCol,
   CRow,
 } from '@coreui/react'
-import React from 'react'
+import React, { useState } from 'react'
 import OrderBacklogList from 'src/components/OrderBacklogList'
+import OrderPICToMe from '../modals/OrderPICToMe'
 
 const data = [
   {
     id: 1,
-    imageUrl: 'https://placehold.co/400',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 1',
     text: 'Some quick example text for Card 1',
   },
   {
     id: 2,
-    imageUrl: 'https://placehold.co/180x200',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 2',
     text: 'Some quick example text for Card 2',
   },
   {
     id: 3,
-    imageUrl: 'https://placehold.co/150x180',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 3',
     text: 'Some quick example text for Card 3',
   },
   {
     id: 4,
-    imageUrl: 'https://placehold.co/180x100',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 4',
     text: 'Some quick example text for Card 4',
   },
   {
     id: 5,
-    imageUrl: 'https://placehold.co/400x360',
+    imageUrl: 'https://placehold.co/200',
     title: 'Card 5',
     text: 'Some quick example text for Card 5',
   },
@@ -47,6 +48,18 @@ const data = [
 ]
 
 function DashboardDesigner() {
+  const [refreshDataFlag, setRefreshDataFlag] = useState(false)
+
+  const toggleRefreshDataFlag = () => {
+    setRefreshDataFlag((prevFlag) => !prevFlag)
+  }
+
+  const [selectedOrderData, setSelectedOrderData] = useState({})
+  const [isPICToMeModalVisible, setIsPICToMeModalVisible] = useState(false)
+  const openPICToMeModal = (orderData) => {
+    setSelectedOrderData(orderData)
+    setIsPICToMeModalVisible(true)
+  }
   return (
     <>
       <CCard className="text-center mb-4">
@@ -81,9 +94,22 @@ function DashboardDesigner() {
           <h5 className="mb-0">Task List (Designer)</h5>
         </CCardHeader>
         <CCardBody>
-          <OrderBacklogList api_path="/api_order/get_orders_by_status?status=100" />
+          <OrderBacklogList
+            api_path="/api_order/get_orders_by_status?status=100"
+            isAdmin={false}
+            refreshDataFlag={refreshDataFlag}
+            openPICToMeModal={openPICToMeModal}
+          />
         </CCardBody>
       </CCard>
+      <OrderPICToMe
+        isOpen={isPICToMeModalVisible}
+        onClose={() => {
+          setIsPICToMeModalVisible(false)
+          toggleRefreshDataFlag()
+        }}
+        orderData={selectedOrderData}
+      />
     </>
   )
 }
