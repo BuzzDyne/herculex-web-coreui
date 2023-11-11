@@ -181,16 +181,9 @@ const OrderInitialDataEdit = ({ isOpen, onClose, orderData }) => {
   }
 
   return (
-    <CModal
-      alignment="center"
-      visible={isOpen}
-      onClose={closeSelf}
-      aria-labelledby="VerticallyCenteredExample"
-    >
+    <CModal alignment="center" visible={isOpen} onClose={closeSelf}>
       <CModalHeader>
-        <CModalTitle id="VerticallyCenteredExample">
-          Edit Initial Data (Order #{orderData.id})
-        </CModalTitle>
+        <CModalTitle>Edit Initial Data (Order #{orderData.id})</CModalTitle>
       </CModalHeader>
       <CModalBody>
         {formSubmitErrorMsg && <CAlert color="danger">{formSubmitErrorMsg}</CAlert>}

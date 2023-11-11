@@ -1,30 +1,27 @@
 import React from 'react'
 
-import DashboardAdmin from './DashboardAdmin'
-import DashboardDesigner from './DashboardDesigner'
-import DashboardPacker from './DashboardPacker'
-import DashboardPrinter from './DashboardPrinter'
 import useAuth from 'src/hooks/useAuth'
 import { ROLE_NAMES } from 'src/constant'
+import DashboardTasks from './DashboardTasks'
 
 const Dashboard = () => {
-  const { auth, setAuth } = useAuth()
+  const { auth } = useAuth()
   const userRole = ROLE_NAMES[auth.token_role_id] || ''
 
   let dashboardToRender
 
   switch (userRole) {
     case 'Admin':
-      dashboardToRender = <DashboardAdmin />
+      dashboardToRender = <DashboardTasks roleID={1} />
       break
     case 'Designer':
-      dashboardToRender = <DashboardDesigner />
-      break
-    case 'Packer':
-      dashboardToRender = <DashboardPacker />
+      dashboardToRender = <DashboardTasks roleID={2} />
       break
     case 'Printer':
-      dashboardToRender = <DashboardPrinter />
+      dashboardToRender = <DashboardTasks roleID={3} />
+      break
+    case 'Packer':
+      dashboardToRender = <DashboardTasks roleID={4} />
       break
     default:
       dashboardToRender = <div>No Dashboard Available</div>

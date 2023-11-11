@@ -31,6 +31,12 @@ export const getStatusBadge = (internal_order_status) => {
   }
 }
 
+export const formatPeriodToString = (timePeriod) => {
+  return timePeriod
+    ? `${timePeriod.slice(0, 4)}/${timePeriod.slice(4, 6)}/${timePeriod.slice(6)}`
+    : '-'
+}
+
 export const formatTStoPrettyString = (timestamp) => {
   if (timestamp === null) {
     return '-'

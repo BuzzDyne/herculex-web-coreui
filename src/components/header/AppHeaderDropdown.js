@@ -11,17 +11,7 @@ import {
   CDropdownToggle,
   CRow,
 } from '@coreui/react'
-import {
-  cilBell,
-  cilCreditCard,
-  cilCommentSquare,
-  cilEnvelopeOpen,
-  cilFile,
-  cilAccountLogout,
-  cilSettings,
-  cilTask,
-  cilUser,
-} from '@coreui/icons'
+import { cilFile, cilAccountLogout, cilSettings, cilUser } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
 import avatar8 from './../../assets/images/avatars/8.jpg'
@@ -53,19 +43,19 @@ const AppHeaderDropdown = () => {
           <CRow>{userRole}</CRow>
         </CContainer>
         <CDropdownHeader className="bg-light fw-semibold py-2">Settings</CDropdownHeader>
-        <CDropdownItem href="#" disabled>
+        <CDropdownItem disabled>
           <CIcon icon={cilUser} className="me-2" />
           Profile
         </CDropdownItem>
 
-        <CDropdownItem href="#" disabled>
+        <CDropdownItem disabled>
           <CIcon icon={cilFile} className="me-2" />
           Task List
           <CBadge color="primary" className="ms-2">
             0
           </CBadge>
         </CDropdownItem>
-        <CDropdownItem href="#" disabled>
+        <CDropdownItem disabled>
           <CIcon icon={cilSettings} className="me-2" />
           Settings
         </CDropdownItem>

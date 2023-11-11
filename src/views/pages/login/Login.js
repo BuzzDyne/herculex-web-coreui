@@ -114,6 +114,7 @@ const Login = () => {
                         autoFocus
                         onChange={(event) => setUsername(event.target.value)}
                         id="email"
+                        style={{ boxShadow: '0 0 transparent' }}
                         onKeyDown={(event) => {
                           if (event.key === 'Enter') {
                             event.preventDefault() // Prevent the default form submission
@@ -133,6 +134,7 @@ const Login = () => {
                         autoComplete="off"
                         value={pwd}
                         id="password"
+                        style={{ boxShadow: '0 0 transparent' }}
                         onChange={(event) => setPwd(event.target.value)}
                         onKeyDown={(event) => {
                           if (event.key === 'Enter') {

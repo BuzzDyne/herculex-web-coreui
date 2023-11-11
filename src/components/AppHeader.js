@@ -1,26 +1,51 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
   CHeader,
-  CHeaderBrand,
-  CHeaderDivider,
   CHeaderNav,
   CHeaderToggler,
-  CNavLink,
-  CNavItem,
+  CFormInput,
+  CInputGroup,
+  CInputGroupText,
+  CButton,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons'
+import { cilMenu, cilSearch } from '@coreui/icons'
 
-import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { logo } from 'src/assets/brand/logo'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const navigate = useNavigate()
+
+  const [orderId, setOrderId] = useState('')
+
+  const handleGoToOrderDetail = () => {
+    if (orderId) {
+      setOrderId('')
+      navigate(`/order_detail/${orderId}`)
+    }
+  }
+
+  const handleKeyUp = (e) => {
+    if (e.key === 'Enter') {
+      handleGoToOrderDetail()
+    }
+  }
+
+  const handleSearchButtonClick = () => {
+    handleGoToOrderDetail()
+  }
+
+  const handleInputChange = (e) => {
+    // Allow only numbers
+    const input = e.target.value.replace(/[^0-9]/g, '')
+    setOrderId(input)
+  }
 
   return (
     <CHeader position="sticky" className="mb-4">
@@ -48,23 +73,28 @@ const AppHeader = () => {
           </CNavItem>
         </CHeaderNav> */}
         <CHeaderNav>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilBell} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
+          <CInputGroup className="">
+            <CInputGroupText>#</CInputGroupText>
+            <CFormInput
+              style={{ maxWidth: '100px', boxShadow: '0 0 transparent' }}
+              size="sm"
+              placeholder="OrderID"
+              value={orderId}
+              onChange={handleInputChange}
+              onKeyUp={handleKeyUp}
+            />
+            <CButton type="button" color="primary" onClick={handleSearchButtonClick}>
+              <CIcon icon={cilSearch} />
+            </CButton>
+          </CInputGroup>
+
+          {/* <CNavItem>
+            <CNavLink>
               <CIcon icon={cilEnvelopeOpen} size="lg" />
             </CNavLink>
-          </CNavItem>
+          </CNavItem> */}
         </CHeaderNav>
-        <CHeaderNav className="ms-3">
+        <CHeaderNav className="">
           <AppHeaderDropdown />
         </CHeaderNav>
       </CContainer>
