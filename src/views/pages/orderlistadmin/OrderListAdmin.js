@@ -126,9 +126,7 @@ const OrderListAdmin = () => {
             <CCol xs="auto">
               <CButtonGroup>
                 <CDropdown variant="btn-group">
-                  <CDropdownToggle color="primary">
-                    Active Filter: {selectedFilter.name}
-                  </CDropdownToggle>
+                  <CDropdownToggle color="primary">Filter: {selectedFilter.name}</CDropdownToggle>
                   <CDropdownMenu>
                     {filterOptions.map((filter, index) =>
                       filter.name === 'DIVIDER' ? (

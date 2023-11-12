@@ -116,27 +116,20 @@ const OrderBacklogList = ({
                         <CDropdown style={{ cursor: 'pointer' }}>
                           <CDropdownToggle color="light" />
                           <CDropdownMenu>
-                            {roleID === 1 ? (
+                            {roleID === 1 && data.order.internal_status_id === '000' && (
                               <>
-                                <CDropdownItem onClick={() => openPICModal(data.order)}>
-                                  Set PIC
+                                <CDropdownItem
+                                  onClick={() => openOrderInitialDataCreateModal(data.order.id)}
+                                >
+                                  Input Initial Data
                                 </CDropdownItem>
-                                {data.order.internal_status_id === '000' && (
-                                  <>
-                                    <CDropdownDivider />
-                                    <CDropdownItem
-                                      onClick={() => openOrderInitialDataCreateModal(data.order.id)}
-                                    >
-                                      Input Initial Data
-                                    </CDropdownItem>
-                                  </>
-                                )}
+                                <CDropdownDivider />
                               </>
-                            ) : (
-                              <CDropdownItem onClick={() => openPICToMeModal(data.order)}>
-                                Assign to me
-                              </CDropdownItem>
                             )}
+
+                            <CDropdownItem onClick={() => openPICToMeModal(data.order)}>
+                              Assign to me
+                            </CDropdownItem>
                           </CDropdownMenu>
                         </CDropdown>
                       </CTableDataCell>

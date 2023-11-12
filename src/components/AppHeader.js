@@ -74,9 +74,9 @@ const AppHeader = () => {
         </CHeaderNav> */}
         <CHeaderNav>
           <CInputGroup className="">
-            <CInputGroupText>#</CInputGroupText>
+            {/* <CInputGroupText>#</CInputGroupText> */}
             <CFormInput
-              style={{ maxWidth: '100px', boxShadow: '0 0 transparent' }}
+              style={{ maxWidth: '130px', boxShadow: '0 0 transparent' }}
               size="sm"
               placeholder="OrderID"
               value={orderId}

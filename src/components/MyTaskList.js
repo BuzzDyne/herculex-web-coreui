@@ -126,8 +126,11 @@ const MyTaskList = ({
                       {data.order.thumb_url && (
                         <CCardImage orientation="top" src={data.order.thumb_url} />
                       )}
-
-                      <CCardBody className="d-flex flex-column align-items-center">
+                      <CCardBody
+                        className={`d-flex flex-column align-items-center ${
+                          data.order.thumb_url ? 'pt-1' : ''
+                        }`}
+                      >
                         <CCardTitle className="mt-1 flex-grow-1 d-flex align-items-center">
                           <span
                             onClick={() => handleGoToOrderDetail(data.order.id)}
