@@ -7,6 +7,12 @@ export const getEcomName = (ecommerce_code) => {
       return 'Tokopedia'
     case 'S':
       return 'Shopee'
+    case 'X':
+      return 'Manual (T)'
+    case 'Y':
+      return 'Manual (S)'
+    case 'Z':
+      return 'Manual'
     default:
       return ecommerce_code
   }

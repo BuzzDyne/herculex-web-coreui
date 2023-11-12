@@ -103,7 +103,7 @@ const UserCreateModal = ({ isOpen, onClose }) => {
     setFormSubmitErrorMsg('')
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     let hasValidationErrors = false
     setIsLoading(true)
 

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 
 import {
   CAlert,
-  CBadge,
   CButton,
   CButtonGroup,
   CCard,
@@ -22,7 +21,6 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-  CTooltip,
 } from '@coreui/react'
 import { cilPlus } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
@@ -32,6 +30,7 @@ import OrderInitialDataCreate from '../../../views/modals/OrderInitialDataCreate
 import OrderInitialDataEdit from '../../../views/modals/OrderInitialDataEdit'
 import OrderPICManage from '../../../views/modals/OrderPICManage'
 import { formatTStoPrettyString, getEcomName, getStatusBadge } from 'src/utils'
+import OrderManualCreate from 'src/views/modals/OrderManualCreate'
 
 const OrderListAdmin = () => {
   const navigate = useNavigate()
@@ -57,6 +56,7 @@ const OrderListAdmin = () => {
   const [isInitialCreateModalVisible, setIsInitialCreateModalVisible] = useState(false)
   const [isInitialEditModalVisible, setIsInitialEditModalVisible] = useState(false)
   const [isPICModalVisible, setIsPICModalVisible] = useState(false)
+  const [isManualModalVisible, setIsManualModalVisible] = useState(false)
   const [selectedOrderID, setSelectedOrderID] = useState('')
   const [selectedOrderData, setSelectedOrderData] = useState({})
 
@@ -111,6 +111,10 @@ const OrderListAdmin = () => {
     setIsPICModalVisible(true)
   }
 
+  const openManualModal = () => {
+    setIsManualModalVisible(true)
+  }
+
   return (
     <>
       <CCard>
@@ -146,7 +150,7 @@ const OrderListAdmin = () => {
               </CButtonGroup>
             </CCol>
             <CCol xs="2" className="text-end">
-              <CButton color="success" disabled>
+              <CButton color="success" onClick={() => openManualModal()}>
                 <CIcon icon={cilPlus} />
               </CButton>
             </CCol>
@@ -286,6 +290,13 @@ const OrderListAdmin = () => {
           fetchData()
         }}
         orderData={selectedOrderData}
+      />
+      <OrderManualCreate
+        isOpen={isManualModalVisible}
+        onClose={() => {
+          setIsManualModalVisible(false)
+          fetchData()
+        }}
       />
     </>
   )
