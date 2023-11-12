@@ -197,7 +197,7 @@ const OrderDetail = () => {
               </CCard>
             </CCol>
             <CCol xs="12" md="6" className="mb-3">
-              <OrderCommentList />
+              <OrderCommentList orderID={id} />
             </CCol>
           </CRow>
           <CRow className="mb-3">
