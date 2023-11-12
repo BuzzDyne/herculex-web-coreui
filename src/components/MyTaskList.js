@@ -16,7 +16,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { INTERNAL_ORDER_STATUS } from 'src/constant'
 import useAuth from 'src/hooks/useAuth'
-import { getStatusBadge, formatPeriodToString } from 'src/utils'
+import { getStatusBadge, formatPeriodToString, openWhatsappChat } from 'src/utils'
 
 const MyTaskList = ({
   isLoading,
@@ -173,14 +173,7 @@ const MyTaskList = ({
                                 color={data.order.cust_phone_no ? 'success' : 'secondary'}
                                 disabled={!data.order.cust_phone_no}
                                 onClick={() => {
-                                  const phoneNo = data.order.cust_phone_no
-                                  const waNumber = `62${
-                                    phoneNo && !phoneNo.startsWith('0')
-                                      ? phoneNo.substring(1)
-                                      : phoneNo || ''
-                                  }`
-                                  const waLink = `https://api.whatsapp.com/send?phone=${waNumber}&text=Hello%20this%20is%20Herculex`
-                                  window.open(waLink)
+                                  openWhatsappChat(data.order.cust_phone_no)
                                 }}
                               >
                                 <CIcon icon={cibWhatsapp} />

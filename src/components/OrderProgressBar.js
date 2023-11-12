@@ -1,66 +1,101 @@
 import React from 'react'
 import { CCol, CProgress, CProgressStacked, CRow } from '@coreui/react'
-import { INTERNAL_ORDER_STATUS } from 'src/constant'
+import { formatTStoPrettyString } from 'src/utils'
 
-const CustomStackedProgressBar = ({ statusName }) => {
-  const calculateProgress = (name) => {
-    switch (name) {
-      case 'New Order':
-        return 0
-      case 'Waiting Design':
-        return 20
-      case 'Pending Approval':
-        return 40
-      case 'Printing':
-        return 60
-      case 'Packing':
-        return 80
-      case 'Complete':
-        return 100
+const CustomStackedProgressBar = ({ orderData }) => {
+  const renderCProgress = (order_status) => {
+    switch (order_status) {
+      case '100':
+        return (
+          <>
+            <CProgress value={20} variant="striped" animated color="info" />
+          </>
+        )
+
+      case '200':
+        return (
+          <>
+            <CProgress value={20} color="info" />
+            <CProgress value={20} variant="striped" animated color="danger" />
+          </>
+        )
+
+      case '300':
+        return (
+          <>
+            <CProgress value={20} color="info" />
+            <CProgress value={20} color="danger" />
+            <CProgress value={20} variant="striped" animated color="warning" />
+          </>
+        )
+
+      case '400':
+        return (
+          <>
+            <CProgress value={20} color="info" />
+            <CProgress value={20} color="danger" />
+            <CProgress value={20} color="warning" />
+            <CProgress value={20} variant="striped" animated color="primary" />
+          </>
+        )
+
+      case '999':
+        return (
+          <>
+            <CProgress value={20} color="info" />
+            <CProgress value={20} color="danger" />
+            <CProgress value={20} color="warning" />
+            <CProgress value={20} color="primary" />
+            <CProgress value={20} color="success" />
+          </>
+        )
+
       default:
-        return 0
+        return <></>
     }
   }
-
-  const progress = calculateProgress(statusName)
 
   return (
     <>
       <CRow className="mx-1">
-        <CCol className="text-center">
-          <span className="d-none d-md-block">2023-10-12 14:30</span>
+        <CCol className="text-center p-0">
+          <span className="d-none d-md-block">
+            {formatTStoPrettyString(orderData.design_sub_dt)}
+          </span>
           <b>Design</b>
         </CCol>
-        <CCol />
-        <CCol className="text-center">
-          <span className="d-none d-md-block">2023-10-12 14:30</span>
+        <CCol className="p-0" />
+        <CCol className="text-center p-0">
+          <span className="d-none d-md-block">
+            {formatTStoPrettyString(orderData.print_done_dt)}
+          </span>
           <b>Printing</b>
         </CCol>
-        <CCol />
-        <CCol className="text-center">
-          <span className="d-none d-md-block">2023-10-12 14:30</span>
+        <CCol className="p-0" />
+        <CCol className="text-center p-0">
+          <span className="d-none d-md-block">
+            {formatTStoPrettyString(orderData.packing_done_dt)}
+          </span>
           <b>Complete</b>
         </CCol>
       </CRow>
-      <CProgressStacked>
-        <CProgress value={20} variant="striped" animated color="info" />
-        <CProgress value={20} variant="striped" animated color="danger" />
-        <CProgress value={20} variant="striped" animated color="warning" />
-        <CProgress value={20} variant="striped" animated color="primary" />
-        <CProgress value={20} variant="striped" animated color="success" />
-      </CProgressStacked>
-      <CRow className="mx-1">
-        <CCol />
-        <CCol className="text-center">
+      <CProgressStacked>{renderCProgress(orderData.internal_status_id)}</CProgressStacked>
+      <CRow className="">
+        <CCol className="p-0" />
+        <CCol className="text-center p-0">
           <b>Approval</b>
-          <span className="d-none d-md-block">2023-10-12 14:30</span>
+          <span className="d-none d-md-block">
+            {formatTStoPrettyString(orderData.design_acc_dt)}
+          </span>
         </CCol>
-        <CCol />
-        <CCol className="text-center">
+        <CCol className="p-0" />
+        <CCol className="text-center p-0">
           <b>Packing</b>
-          <span className="d-none d-md-block">2023-10-12 14:30</span>
+          <span className="d-none d-md-block">
+            {formatTStoPrettyString(orderData.packing_done_dt)}
+          </span>
         </CCol>
-        <CCol />
+        <CCol className="p-0" />
       </CRow>
     </>
   )

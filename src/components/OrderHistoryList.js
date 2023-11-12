@@ -1,64 +1,31 @@
-import { CCard, CCardBody, CCardSubtitle, CCardText, CCol } from '@coreui/react'
+import { CCard, CCardBody, CCol } from '@coreui/react'
 import React from 'react'
+import { formatDateTime } from 'src/utils'
 
-const OrderHistoryList = () => {
+const OrderHistoryList = ({ historyList }) => {
   return (
     <CCol>
       <CCard>
         <CCardBody className="py-2">
           <h5>History</h5>
-          <CCard className="mb-2">
-            <CCardBody className="p-2">
-              <blockquote className="blockquote mb-0">
-                <p style={{ fontSize: '0.8em' }}>
-                  Lorem ipsum dolor sit ameor sit amet, consectetur t, consectetur adipiscing elit.
-                  Integer posuere erat a ante.
-                </p>
-                <footer className="blockquote-footer" style={{ fontSize: '0.7em' }}>
-                  User X | 2023-10-31 12:05:31
-                </footer>
-              </blockquote>
-            </CCardBody>
-          </CCard>
-          <CCard className="mb-2">
-            <CCardBody className="p-2">
-              <blockquote className="blockquote mb-0">
-                <p style={{ fontSize: '0.8em' }}>
-                  Lorem ipsum dolor sit ameor sit amet, consectetur t, consectetur adipiscing elit.
-                  Integer posuere erat a ante.
-                </p>
-                <footer className="blockquote-footer" style={{ fontSize: '0.7em' }}>
-                  User X | 2023-10-31 12:05:31
-                </footer>
-              </blockquote>
-            </CCardBody>
-          </CCard>
-          <CCard className="mb-2">
-            <CCardBody className="p-2">
-              <blockquote className="blockquote mb-0">
-                <p style={{ fontSize: '0.8em' }}>
-                  Lorem ipsum dolor sit ameor sit amet, consectetur t, consectetur adipiscing elit.
-                  Integer posuere erat a ante.
-                </p>
-                <footer className="blockquote-footer" style={{ fontSize: '0.7em' }}>
-                  User X | 2023-10-31 12:05:31
-                </footer>
-              </blockquote>
-            </CCardBody>
-          </CCard>
-          <CCard className="mb-2">
-            <CCardBody className="p-2">
-              <blockquote className="blockquote mb-0">
-                <p style={{ fontSize: '0.8em' }}>
-                  Lorem ipsum dolor sit ameor sit amet, consectetur t, consectetur adipiscing elit.
-                  Integer posuere erat a ante.
-                </p>
-                <footer className="blockquote-footer" style={{ fontSize: '0.7em' }}>
-                  User X | 2023-10-31 12:05:31
-                </footer>
-              </blockquote>
-            </CCardBody>
-          </CCard>
+          {historyList.length > 0 ? (
+            historyList.map((item) => (
+              <>
+                <CCard className="mb-2">
+                  <CCardBody className="p-2">
+                    <blockquote className="blockquote mb-0">
+                      <p style={{ fontSize: '0.8em' }}>{item.activity_msg}</p>
+                      <footer className="blockquote-footer" style={{ fontSize: '0.7em' }}>
+                        {item.user_name} | {formatDateTime(item.activity_date)}
+                      </footer>
+                    </blockquote>
+                  </CCardBody>
+                </CCard>
+              </>
+            ))
+          ) : (
+            <p>No order items available.</p>
+          )}
         </CCardBody>
       </CCard>
     </CCol>
