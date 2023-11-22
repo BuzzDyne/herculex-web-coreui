@@ -8,6 +8,7 @@ import {
   CImage,
   CRow,
   CSpinner,
+  CTooltip,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -15,12 +16,14 @@ import OrderCommentList from 'src/components/OrderCommentList'
 import OrderDetailListItem from 'src/components/OrderDetailListItem'
 import OrderHistoryList from 'src/components/OrderHistoryList'
 import CustomStackedProgressBar from 'src/components/OrderProgressBar'
-import { cibWhatsapp, cilFolderOpen } from '@coreui/icons'
+import { cibWhatsapp, cilFolderOpen, cilCopy } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import {
   formatPeriodToString,
   formatTStoPrettyString,
   getEcomName,
+  getEcomOrderID,
+  getImageURLorNoImg,
   openWhatsappChat,
 } from 'src/utils'
 import useAuth from 'src/hooks/useAuth'
@@ -37,6 +40,9 @@ const OrderDetail = () => {
   const [orderItems, setOrderItems] = useState([])
   const [orderTrackings, setOrderTrackings] = useState([])
   const [picUsername, setPicUsername] = useState('')
+
+  const ecomOrderID = getEcomOrderID(order)
+  const [copied, setCopied] = useState(false)
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -68,6 +74,18 @@ const OrderDetail = () => {
       })
   }, [id])
 
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(ecomOrderID)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000) // Reset the "copied" state after 2 seconds
+      })
+      .catch((error) => {
+        console.error('Error copying to clipboard:', error)
+      })
+  }
+
   return (
     <>
       {isLoading ? (
@@ -88,7 +106,7 @@ const OrderDetail = () => {
                 }}
               >
                 <CImage
-                  src={order.thumb_url ? order.thumb_url : 'https://placehold.co/400?text=No+Image'}
+                  src={getImageURLorNoImg(order.thumb_url)}
                   style={{
                     position: 'absolute',
                     width: '100%',
@@ -126,8 +144,17 @@ const OrderDetail = () => {
                           {order.ecom_order_status}
                         </div>
                         <div>
-                          <b>Last Activity</b>: <br className="d-xs-block d-sm-none" />
-                          {formatTStoPrettyString(order.last_updated_ts)}
+                          <b>Platform ID</b>:
+                          <CTooltip content="Copied!" visible={copied} trigger={['focus']}>
+                            <button
+                              onClick={handleCopy}
+                              style={{ cursor: 'pointer', border: 'none', background: 'none' }}
+                            >
+                              <CIcon icon={cilCopy} />
+                            </button>
+                          </CTooltip>
+                          <br className="d-xs-block d-sm-none" />
+                          <span>{ecomOrderID}</span>
                         </div>
                         <div>
                           <b>Current PIC</b>: <br className="d-xs-block d-sm-none" />

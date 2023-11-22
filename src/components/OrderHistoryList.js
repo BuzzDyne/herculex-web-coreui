@@ -16,7 +16,7 @@ const OrderHistoryList = ({ historyList }) => {
                     <blockquote className="blockquote mb-0">
                       <p style={{ fontSize: '0.8em' }}>{item.activity_msg}</p>
                       <footer className="blockquote-footer" style={{ fontSize: '0.7em' }}>
-                        {item.user_name} | {formatDateTime(item.activity_date)}
+                        {formatDateTime(item.activity_date)} | {item.user_name}
                       </footer>
                     </blockquote>
                   </CCardBody>

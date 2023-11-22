@@ -43,17 +43,30 @@ export const formatPeriodToString = (timePeriod) => {
     : '-'
 }
 
+export const getEcomOrderID = (orderData) => {
+  const { ecommerce_code, invoice_ref, ecom_order_id } = orderData
+
+  if (ecommerce_code === 'T') {
+    return invoice_ref !== null ? invoice_ref : '-'
+  } else {
+    return ecom_order_id !== null ? ecom_order_id : '-'
+  }
+}
+
+export const getImageURLorNoImg = (imageURL) =>
+  imageURL ? imageURL : 'https://placehold.co/400?text=No+Image'
+
 export const formatTStoPrettyString = (timestamp) => {
   if (timestamp === null) {
     return '-'
   }
   const now = new Date(Date.now())
   const tsDate = new Date(timestamp)
-  const timeDifference = now - tsDate
+  const timeDifference = now - tsDate - 7 * 60 * 60 * 1000
   const minutes = Math.floor(timeDifference / (1000 * 60))
   const hours = Math.floor(timeDifference / (1000 * 60 * 60))
   const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24))
-  if (minutes < 2) {
+  if (minutes < 1) {
     return `Just now`
   } else if (minutes < 60) {
     return `${minutes}m ago`
@@ -69,11 +82,15 @@ export const formatTStoPrettyString = (timestamp) => {
 export const formatDateTime = (dateTimeString) => {
   const date = new Date(dateTimeString)
 
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
+  // Subtract 7 hours from the timestamp
+  const adjustedTimestamp = date.getTime() + 7 * 60 * 60 * 1000
+  const adjustedDate = new Date(adjustedTimestamp)
+
+  const year = adjustedDate.getFullYear()
+  const month = String(adjustedDate.getMonth() + 1).padStart(2, '0')
+  const day = String(adjustedDate.getDate()).padStart(2, '0')
+  const hours = String(adjustedDate.getHours()).padStart(2, '0')
+  const minutes = String(adjustedDate.getMinutes()).padStart(2, '0')
 
   const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}`
 

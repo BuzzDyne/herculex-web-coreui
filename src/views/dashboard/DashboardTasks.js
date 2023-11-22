@@ -12,6 +12,7 @@ import OrderApproveDesign from '../modals/OrderApproveDesign'
 import OrderDonePrinting from '../modals/OrderDonePrinting'
 import OrderDonePacking from '../modals/OrderDonePacking'
 import OrderRejectDesign from '../modals/OrderRejectDesign'
+import ImageViewModal from '../modals/ImageViewModal'
 
 const DashboardTasks = ({ roleID }) => {
   const [orderList, setOrderList] = useState([])
@@ -32,6 +33,12 @@ const DashboardTasks = ({ roleID }) => {
   const openPICModal = (orderData) => {
     setSelectedOrderData(orderData)
     setIsPICModalVisible(true)
+  }
+
+  const [isImageViewModalVisible, setIsImageViewModalVisible] = useState(false)
+  const openImageViewModal = (orderData) => {
+    setSelectedOrderData(orderData)
+    setIsImageViewModalVisible(true)
   }
 
   const [isPICToMeModalVisible, setIsPICToMeModalVisible] = useState(false)
@@ -131,6 +138,7 @@ const DashboardTasks = ({ roleID }) => {
         openPICModal={openPICModal}
         openOrderInitialDataCreateModal={openOrderInitialDataCreateModal}
         openPICToMeModal={openPICToMeModal}
+        openImageViewModal={openImageViewModal}
       />
 
       <OrderPICManage
@@ -200,6 +208,14 @@ const DashboardTasks = ({ roleID }) => {
         onClose={() => {
           setIsDonePackingModalVisible(false)
           toggleRefreshDataFlag()
+        }}
+        orderData={selectedOrderData}
+      />
+
+      <ImageViewModal
+        isOpen={isImageViewModalVisible}
+        onClose={() => {
+          setIsImageViewModalVisible(false)
         }}
         orderData={selectedOrderData}
       />

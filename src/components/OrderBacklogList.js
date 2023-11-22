@@ -8,6 +8,8 @@ import {
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
+  CImage,
+  CModal,
   CSpinner,
   CTable,
   CTableBody,
@@ -24,6 +26,7 @@ import {
   getEcomName,
   getStatusBadge,
   formatPeriodToString,
+  getImageURLorNoImg,
 } from 'src/utils'
 
 const OrderBacklogList = ({
@@ -33,6 +36,7 @@ const OrderBacklogList = ({
   openPICModal,
   openOrderInitialDataCreateModal,
   openPICToMeModal,
+  openImageViewModal,
 }) => {
   const navigate = useNavigate()
 
@@ -61,6 +65,9 @@ const OrderBacklogList = ({
                   <CTableRow>
                     <CTableHeaderCell className="text-center" scope="col">
                       ID
+                    </CTableHeaderCell>
+                    <CTableHeaderCell className="text-center" scope="col">
+                      Image
                     </CTableHeaderCell>
                     <CTableHeaderCell className="text-center" scope="col">
                       Platform
@@ -97,6 +104,34 @@ const OrderBacklogList = ({
                           {data.order.id}
                         </span>
                       </CTableHeaderCell>
+                      <CTableDataCell
+                        className="text-center"
+                        style={{ display: 'flex', justifyContent: 'center' }}
+                      >
+                        <div
+                          style={{
+                            width: '50px', // Set a fixed width for the container
+                            height: '50px', // Set a fixed height for the container
+                            overflow: 'hidden', // Hide any content that overflows the container
+                            position: 'relative', // Set position to relative for absolute centering
+                            cursor: 'pointer',
+                          }}
+                          onClick={() => openImageViewModal(data.order)}
+                        >
+                          <CImage
+                            src={getImageURLorNoImg(data.order.thumb_url)}
+                            alt="placeholder"
+                            style={{
+                              width: '100%', // Ensure the image takes up the full width of its container
+                              height: '100%', // Ensure the image takes up the full height of its container
+                              objectFit: 'cover', // Ensure the image covers the entire container
+                              objectPosition: '50% 50%', // Center-cut the image
+                              maxHeight: '100%', // Set the maximum height to the height of the container
+                              maxWidth: '100%', // Set the maximum width to the width of the container
+                            }}
+                          />
+                        </div>
+                      </CTableDataCell>
                       <CTableDataCell className="text-center">
                         {getEcomName(data.order.ecommerce_code)}
                       </CTableDataCell>
@@ -141,6 +176,7 @@ const OrderBacklogList = ({
           )}
         </CCardBody>
       </CCard>
+      <CModal></CModal>
     </>
   )
 }
