@@ -126,28 +126,32 @@ const DashboardTasks = ({ roleID }) => {
 
       {auth.token_role_id === 2 && <OrderToBatchFileList />}
 
-      <OrderBatchList />
+      {auth.token_role_id === 3 ? (
+        <OrderBatchList />
+      ) : (
+        <>
+          <MyTaskList
+            isLoading={isLoading}
+            orderList={orderList}
+            openOrderInitialDataCreateModal={openOrderInitialDataCreateModal}
+            openDesignLinksModal={openDesignLinksModal}
+            openApproveDesignModal={openApproveDesignModal}
+            openRejectDesignModal={openRejectDesignModal}
+            openDonePrintingModal={openDonePrintingModal}
+            openDonePackingModal={openDonePackingModal}
+          />
 
-      <MyTaskList
-        isLoading={isLoading}
-        orderList={orderList}
-        openOrderInitialDataCreateModal={openOrderInitialDataCreateModal}
-        openDesignLinksModal={openDesignLinksModal}
-        openApproveDesignModal={openApproveDesignModal}
-        openRejectDesignModal={openRejectDesignModal}
-        openDonePrintingModal={openDonePrintingModal}
-        openDonePackingModal={openDonePackingModal}
-      />
-
-      <OrderBacklogList
-        roleID={roleID}
-        isLoading={isLoading}
-        orderList={orderList}
-        openPICModal={openPICModal}
-        openOrderInitialDataCreateModal={openOrderInitialDataCreateModal}
-        openPICToMeModal={openPICToMeModal}
-        openImageViewModal={openImageViewModal}
-      />
+          <OrderBacklogList
+            roleID={roleID}
+            isLoading={isLoading}
+            orderList={orderList}
+            openPICModal={openPICModal}
+            openOrderInitialDataCreateModal={openOrderInitialDataCreateModal}
+            openPICToMeModal={openPICToMeModal}
+            openImageViewModal={openImageViewModal}
+          />
+        </>
+      )}
 
       <OrderPICManage
         isOpen={isPICModalVisible}
