@@ -124,11 +124,7 @@ const DashboardTasks = ({ roleID }) => {
         </CCol>
       )}
 
-      {auth.token_role_id === 2 && <OrderToBatchFileList />}
-
-      {auth.token_role_id === 3 ? (
-        <OrderBatchList />
-      ) : (
+      {auth.token_role_id === 1 && (
         <>
           <MyTaskList
             isLoading={isLoading}
@@ -140,7 +136,48 @@ const DashboardTasks = ({ roleID }) => {
             openDonePrintingModal={openDonePrintingModal}
             openDonePackingModal={openDonePackingModal}
           />
+          <OrderBacklogList
+            roleID={roleID}
+            isLoading={isLoading}
+            orderList={orderList}
+            openPICModal={openPICModal}
+            openOrderInitialDataCreateModal={openOrderInitialDataCreateModal}
+            openPICToMeModal={openPICToMeModal}
+            openImageViewModal={openImageViewModal}
+          />
+        </>
+      )}
 
+      {auth.token_role_id === 2 && (
+        <>
+          <OrderToBatchFileList />
+          <MyTaskList
+            isLoading={isLoading}
+            orderList={orderList}
+            openOrderInitialDataCreateModal={openOrderInitialDataCreateModal}
+            openDesignLinksModal={openDesignLinksModal}
+            openApproveDesignModal={openApproveDesignModal}
+            openRejectDesignModal={openRejectDesignModal}
+            openDonePrintingModal={openDonePrintingModal}
+            openDonePackingModal={openDonePackingModal}
+          />
+        </>
+      )}
+
+      {auth.token_role_id === 3 && <OrderBatchList />}
+
+      {auth.token_role_id === 4 && (
+        <>
+          <MyTaskList
+            isLoading={isLoading}
+            orderList={orderList}
+            openOrderInitialDataCreateModal={openOrderInitialDataCreateModal}
+            openDesignLinksModal={openDesignLinksModal}
+            openApproveDesignModal={openApproveDesignModal}
+            openRejectDesignModal={openRejectDesignModal}
+            openDonePrintingModal={openDonePrintingModal}
+            openDonePackingModal={openDonePackingModal}
+          />
           <OrderBacklogList
             roleID={roleID}
             isLoading={isLoading}
