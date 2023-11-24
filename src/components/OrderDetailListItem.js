@@ -3,7 +3,6 @@ import React from 'react'
 import { formatNumberWithCommas } from 'src/utils'
 
 const OrderDetailListItem = ({ itemData }) => {
-  console.log('OrderDetailListItem', itemData)
   return (
     <>
       <CRow className="mb-2">

@@ -1,0 +1,8 @@
+.hoverable {
+  transition: box-shadow 0.3s ease, cursor 0.3s ease; /* Add transition properties */
+}
+
+.hoverable:hover {
+  /* Hovered box shadow */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}

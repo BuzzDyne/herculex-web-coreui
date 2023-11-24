@@ -31,7 +31,7 @@ const OrderCommentList = ({ orderID, onClose }) => {
     axiosPrivate
       .get(`/api_order/id/${orderID}/get_comments`)
       .then((response) => {
-        console.log('/get_comments:', response.data)
+        // console.log('/get_comments:', response.data)
         setCommentList(response.data)
         setIsLoading(false)
       })
@@ -61,7 +61,7 @@ const OrderCommentList = ({ orderID, onClose }) => {
         comment: formCommentValue,
       })
       .then((response) => {
-        console.log('Submission successful', response.data)
+        // console.log('Submission successful', response.data)
         setFormCommentValue('')
         setIsSubmitting(false)
         fetchData()

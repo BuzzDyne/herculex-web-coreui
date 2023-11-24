@@ -23,7 +23,7 @@ const UserDeleteModal = ({ userID, userName, isOpen, onClose }) => {
     setIsLoading(true)
     try {
       const response = await axiosPrivate.delete(`/api_user/id/${userID}`)
-      console.log(response.data)
+      // console.log(response.data)
     } catch (err) {
       console.error(err)
       return

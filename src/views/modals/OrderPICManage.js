@@ -57,7 +57,7 @@ const OrderPICManage = ({ isOpen, onClose, orderData }) => {
       .get('/api_user/get_list')
       .then((response) => {
         setUserList(response.data)
-        console.log('response.data: ', response.data)
+        // console.log('response.data: ', response.data)
         setSelectedPIC(orderData.pic_user_id)
         setFormSubmitErrorMsg('')
         setIsLoading(false)
@@ -85,7 +85,7 @@ const OrderPICManage = ({ isOpen, onClose, orderData }) => {
         pic_id: picId,
       })
       .then((response) => {
-        console.log('Submission successful', response.data)
+        // console.log('Submission successful', response.data)
         setIsLoading(false) // Set isLoading to false
         onClose()
       })

@@ -56,7 +56,6 @@ const UserEditModal = ({ userData, isOpen, onClose }) => {
 
     // Check if RePwd needs validation
     if (password.length >= 4 && formRePwdValue !== password) {
-      console.log(password.length)
       setFormRePwdErrorMsg('Passwords do not match')
     } else {
       setFormRePwdErrorMsg('') // Clear error message if passwords match
@@ -125,7 +124,7 @@ const UserEditModal = ({ userData, isOpen, onClose }) => {
       }
       await axiosPrivate.patch(`/api_user/id/${userData.id}`, payload)
     } catch (err) {
-      console.log(err)
+      console.error(err)
       setFormSubmitErrorMsg(err)
       return
     }

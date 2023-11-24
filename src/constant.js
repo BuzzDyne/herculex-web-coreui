@@ -17,6 +17,7 @@ export const INTERNAL_ORDER_STATUS = {
   '000': { name: 'New Order', colorname: 'dark', buttonText: 'Input Data' }, 
   '100': { name: 'Waiting Design', colorname: 'info', buttonText: 'Submit Design' }, 
   '200': { name: 'Pending Approval', colorname: 'danger', buttonText: 'Approve Design' }, 
+  '250': { name: 'Pending BatchFile', colorname: 'dark', buttonText: 'Create BatchFile' }, 
   '300': { name: 'Printing', colorname: 'warning', buttonText: 'Done Printing' }, 
   '400': { name: 'Packing', colorname: 'primary', buttonText: 'Done Packing' }, 
   '999': { name: 'Complete', colorname: 'success', buttonText: '' },

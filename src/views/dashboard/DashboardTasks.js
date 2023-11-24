@@ -13,8 +13,12 @@ import OrderDonePrinting from '../modals/OrderDonePrinting'
 import OrderDonePacking from '../modals/OrderDonePacking'
 import OrderRejectDesign from '../modals/OrderRejectDesign'
 import ImageViewModal from '../modals/ImageViewModal'
+import OrderToBatchFileList from 'src/components/OrderToBatchFileList'
+import useAuth from 'src/hooks/useAuth'
+import OrderBatchList from 'src/components/OrderBatchList'
 
 const DashboardTasks = ({ roleID }) => {
+  const { auth } = useAuth()
   const [orderList, setOrderList] = useState([])
 
   const [isLoading, setIsLoading] = useState(false)
@@ -93,7 +97,7 @@ const DashboardTasks = ({ roleID }) => {
     axiosPrivate
       .get(apiPath)
       .then((response) => {
-        console.log(apiPath, ':', response.data)
+        // console.log(apiPath, ':', response.data)
         setOrderList(response.data)
         setIsLoading(false)
       })
@@ -119,6 +123,10 @@ const DashboardTasks = ({ roleID }) => {
           </CAlert>
         </CCol>
       )}
+
+      {auth.token_role_id === 2 && <OrderToBatchFileList />}
+
+      <OrderBatchList />
 
       <MyTaskList
         isLoading={isLoading}

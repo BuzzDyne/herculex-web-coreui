@@ -68,7 +68,7 @@ const OrderListAdmin = () => {
     axiosPrivate
       .get(selectedFilter.api_path)
       .then((response) => {
-        console.log(selectedFilter.name, ':', response.data)
+        // console.log(selectedFilter.name, ':', response.data)
         setOrderListAdmin(response.data)
         setIsLoading(false)
       })

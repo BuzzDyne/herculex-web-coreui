@@ -59,7 +59,7 @@ const OrderInitialDataCreate = ({ isOpen, onClose, orderID }) => {
       .get('/api_user/get_designers')
       .then((response) => {
         setUserList(response.data)
-        console.log('response.data: ', response.data)
+        // console.log('response.data: ', response.data)
         setFormSubmitErrorMsg('')
         setIsLoading(false)
       })
@@ -186,7 +186,7 @@ const OrderInitialDataCreate = ({ isOpen, onClose, orderID }) => {
         pic_user_id: picId,
       })
       .then((response) => {
-        console.log('Submission successful', response.data)
+        // console.log('Submission successful', response.data)
         setIsLoading(false) // Set isLoading to false
         onClose()
       })

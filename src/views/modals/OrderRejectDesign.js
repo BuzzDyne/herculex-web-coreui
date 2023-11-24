@@ -36,7 +36,7 @@ const OrderRejectDesign = ({ isOpen, onClose, orderData }) => {
         user_id: auth.token_user_id,
       })
       .then((response) => {
-        console.log('Submission successful', response.data)
+        // console.log('Submission successful', response.data)
         setIsLoading(false) // Set isLoading to false
         onClose()
       })

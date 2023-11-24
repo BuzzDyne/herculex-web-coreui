@@ -1,24 +1,18 @@
 import {
   CAlert,
-  CBadge,
   CButton,
-  CCol,
-  CForm,
-  CFormInput,
-  CFormSelect,
   CModal,
   CModalBody,
   CModalFooter,
   CModalHeader,
   CModalTitle,
-  CRow,
   CSpinner,
 } from '@coreui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import useAuth from 'src/hooks/useAuth'
 import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
 
-const OrderPICToMe = ({ isOpen, onClose, orderData }) => {
+const OrderBatchFileDone = ({ isOpen, onClose, batchData }) => {
   const { auth } = useAuth()
 
   const [formSubmitErrorMsg, setFormSubmitErrorMsg] = useState('')
@@ -26,20 +20,19 @@ const OrderPICToMe = ({ isOpen, onClose, orderData }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const axiosPrivate = useAxiosPrivate()
-
   const closeSelf = () => {
     onClose()
     setIsLoading(false)
 
     setFormSubmitErrorMsg('')
   }
+
   const handleSubmit = () => {
     setIsLoading(true)
 
     axiosPrivate
-      .patch(`/api_order/id/${orderData.id}/update_pic`, {
+      .patch(`/api_order/batchfile/id/${batchData.id}/submit_print_done`, {
         user_id: auth.token_user_id,
-        pic_id: auth.token_user_id,
       })
       .then((response) => {
         // console.log('Submission successful', response.data)
@@ -56,13 +49,11 @@ const OrderPICToMe = ({ isOpen, onClose, orderData }) => {
   return (
     <CModal alignment="center" visible={isOpen} onClose={closeSelf}>
       <CModalHeader>
-        <CModalTitle>Assign Order #{orderData.id} to me?</CModalTitle>
+        <CModalTitle>Batch {batchData.batch_name} Done Printing?</CModalTitle>
       </CModalHeader>
       <CModalBody>
         {formSubmitErrorMsg && <CAlert color="danger">{formSubmitErrorMsg}</CAlert>}
-        <p>
-          Are you sure to assign order <strong>#{orderData.id}</strong> to you?
-        </p>
+        <p>Are you sure Batch {batchData.batch_name} has finished Printing process?</p>
       </CModalBody>
       <CModalFooter>
         <CButton color="secondary" onClick={closeSelf}>
@@ -88,4 +79,4 @@ const OrderPICToMe = ({ isOpen, onClose, orderData }) => {
   )
 }
 
-export default OrderPICToMe
+export default OrderBatchFileDone

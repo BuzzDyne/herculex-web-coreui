@@ -18,6 +18,44 @@ export const getEcomName = (ecommerce_code) => {
   }
 }
 
+export const getEcomBadge = (ecommerce_code) => {
+  switch (ecommerce_code) {
+    case 'T':
+      return (
+        <CBadge size="lg" color="success">
+          Tokopedia
+        </CBadge>
+      )
+
+    case 'S':
+      return (
+        <CBadge size="lg" color="warning">
+          Shopee
+        </CBadge>
+      )
+    case 'X':
+      return (
+        <CBadge size="lg" color="success">
+          Shopee (Tokopedia)
+        </CBadge>
+      )
+    case 'Y':
+      return (
+        <CBadge size="lg" color="warning">
+          Shopee (Manual)
+        </CBadge>
+      )
+    case 'Z':
+      return (
+        <CBadge size="lg" color="primary">
+          Manual
+        </CBadge>
+      )
+    default:
+      return ecommerce_code
+  }
+}
+
 export const getStatusBadge = (internal_order_status) => {
   const statusInfo = INTERNAL_ORDER_STATUS[internal_order_status]
 

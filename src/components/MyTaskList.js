@@ -36,8 +36,6 @@ const MyTaskList = ({
     (data) => data.order.pic_user_id === auth.token_user_id,
   )
 
-  console.log('auth:', auth)
-
   const handleGoToOrderDetail = (orderId) => {
     navigate(`/order_detail/${orderId}`)
   }

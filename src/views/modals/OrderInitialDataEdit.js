@@ -140,7 +140,7 @@ const OrderInitialDataEdit = ({ isOpen, onClose, orderData }) => {
 
     //
     if (orderData.cust_phone_no == formCustPhoneValue && orderData.user_deadline_prd == dateStr) {
-      console.log('Skip submit, exact same data')
+      // console.log('Skip submit, exact same data')
       onClose()
       return
     }
@@ -153,7 +153,7 @@ const OrderInitialDataEdit = ({ isOpen, onClose, orderData }) => {
         user_id: auth.token_user_id,
       })
       .then((response) => {
-        console.log('Submission successful', response.data)
+        // console.log('Submission successful', response.data)
         onClose()
       })
       .catch((error) => {

@@ -66,12 +66,12 @@ const Login = () => {
     } catch (err) {
       if (!err?.response) {
         setErrMsg('No Server Response')
-        console.log(err)
+        console.error(err)
       } else if (err.response.status === 400) {
         setErrMsg(err.response.data.detail)
       } else {
         setErrMsg('Something went wrong...')
-        console.log(err)
+        console.error(err)
       }
     } finally {
       setLoading(false) // Set loading back to false when the request completes

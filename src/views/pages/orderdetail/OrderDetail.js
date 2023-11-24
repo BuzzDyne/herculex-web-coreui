@@ -20,8 +20,7 @@ import { cibWhatsapp, cilFolderOpen, cilCopy } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import {
   formatPeriodToString,
-  formatTStoPrettyString,
-  getEcomName,
+  getEcomBadge,
   getEcomOrderID,
   getImageURLorNoImg,
   openWhatsappChat,
@@ -40,6 +39,7 @@ const OrderDetail = () => {
   const [orderItems, setOrderItems] = useState([])
   const [orderTrackings, setOrderTrackings] = useState([])
   const [picUsername, setPicUsername] = useState('')
+  const [batchName, setBatchName] = useState('')
 
   const ecomOrderID = getEcomOrderID(order)
   const [copied, setCopied] = useState(false)
@@ -54,11 +54,12 @@ const OrderDetail = () => {
     axiosPrivate
       .get(api_path)
       .then((response) => {
-        console.log(api_path, ':', response.data)
+        // console.log(api_path, ':', response.data)
         setOrder(response.data.order_data)
         setOrderItems(response.data.order_items_data)
         setOrderTrackings(response.data.order_trackings)
         setPicUsername(response.data.pic_username)
+        setBatchName(response.data.batch_name)
         setIsLoading(false)
       })
       .catch((err) => {
@@ -66,7 +67,7 @@ const OrderDetail = () => {
         setOrder('')
         setIsLoading(false)
         if (err.response.status === 404 && err.response.data.detail === 'ID not found') {
-          console.log('inside 404 call')
+          // console.log('inside 404 call')
           navigate('/404')
           return
         }
@@ -121,13 +122,27 @@ const OrderDetail = () => {
             <CCol xs="12" md="9">
               <CCard style={{ height: '100%' }}>
                 <CCardBody className="py-2">
-                  <CCardTitle className="fw-bold fs-3">Order #{id}</CCardTitle>
+                  <CCardTitle className="fw-bold fs-3">
+                    Order #{id}
+                    <span className="ms-1" style={{ fontSize: 'medium' }}>
+                      {getEcomBadge(order.ecommerce_code)}
+                    </span>
+                  </CCardTitle>
                   <CCardText>
                     <CRow>
                       <CCol>
                         <div>
-                          <b>Platform</b>: <br className="d-xs-block d-sm-none" />
-                          {getEcomName(order.ecommerce_code)}
+                          <b>Platform ID</b>:
+                          <CTooltip content="Copied!" visible={copied} trigger={['focus']}>
+                            <button
+                              onClick={handleCopy}
+                              style={{ cursor: 'pointer', border: 'none', background: 'none' }}
+                            >
+                              <CIcon icon={cilCopy} />
+                            </button>
+                          </CTooltip>
+                          <br className="d-xs-block d-sm-none" />
+                          <span>{ecomOrderID}</span>
                         </div>
                         <div>
                           <b>Phone</b>: <br className="d-xs-block d-sm-none" />
@@ -144,17 +159,8 @@ const OrderDetail = () => {
                           {order.ecom_order_status}
                         </div>
                         <div>
-                          <b>Platform ID</b>:
-                          <CTooltip content="Copied!" visible={copied} trigger={['focus']}>
-                            <button
-                              onClick={handleCopy}
-                              style={{ cursor: 'pointer', border: 'none', background: 'none' }}
-                            >
-                              <CIcon icon={cilCopy} />
-                            </button>
-                          </CTooltip>
-                          <br className="d-xs-block d-sm-none" />
-                          <span>{ecomOrderID}</span>
+                          <b>BatchFile</b>: <br className="d-xs-block d-sm-none" />
+                          {batchName || '-'}
                         </div>
                         <div>
                           <b>Current PIC</b>: <br className="d-xs-block d-sm-none" />
