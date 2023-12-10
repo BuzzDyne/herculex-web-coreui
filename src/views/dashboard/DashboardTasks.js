@@ -164,7 +164,7 @@ const DashboardTasks = ({ roleID }) => {
         </>
       )}
 
-      {auth.token_role_id === 3 && <OrderBatchList />}
+      {auth.token_role_id === 3 && <OrderBatchList compType="packer" />}
 
       {auth.token_role_id === 4 && (
         <>

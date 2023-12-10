@@ -24,7 +24,7 @@ import { useNavigate } from 'react-router-dom'
 import OrderBatchFileDone from 'src/views/modals/OrderBatchFileDone'
 import ImageViewModal from 'src/views/modals/ImageViewModal'
 
-const OrderBatchList = () => {
+const OrderBatchList = ({ compType }) => {
   const navigate = useNavigate()
 
   const [isLoading, setIsLoading] = useState(false)
@@ -207,16 +207,18 @@ const OrderBatchList = () => {
                           </CListGroup>
                         </CCol>
                       </CRow>
-                      <CCardFooter>
-                        <CButton
-                          className="w-100"
-                          color="success"
-                          size="sm"
-                          onClick={() => openCreateBatchModal(batch)}
-                        >
-                          Done
-                        </CButton>
-                      </CCardFooter>
+                      {compType === 'packer' && (
+                        <CCardFooter>
+                          <CButton
+                            className="w-100"
+                            color="success"
+                            size="sm"
+                            onClick={() => openCreateBatchModal(batch)}
+                          >
+                            Done
+                          </CButton>
+                        </CCardFooter>
+                      )}
                     </CCard>
                   </CCol>
                 ))

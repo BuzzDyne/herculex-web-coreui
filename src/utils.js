@@ -36,7 +36,7 @@ export const getEcomBadge = (ecommerce_code) => {
     case 'X':
       return (
         <CBadge size="lg" color="success">
-          Shopee (Tokopedia)
+          Tokopedia (Manual)
         </CBadge>
       )
     case 'Y':
