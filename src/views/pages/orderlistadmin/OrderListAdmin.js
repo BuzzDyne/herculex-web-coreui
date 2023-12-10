@@ -13,6 +13,8 @@ import {
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
+  CFormInput,
+  CInputGroup,
   CRow,
   CSpinner,
   CTable,
@@ -22,14 +24,14 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import { cilPlus } from '@coreui/icons'
+import { cilPlus, cilSearch } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import useAxiosPrivate from '../../../hooks/useAxiosPrivate'
 import OrderInitialDataCreate from '../../../views/modals/OrderInitialDataCreate'
 import OrderInitialDataEdit from '../../../views/modals/OrderInitialDataEdit'
 import OrderPICManage from '../../../views/modals/OrderPICManage'
-import { formatTStoPrettyString, getEcomName, getStatusBadge } from 'src/utils'
+import { getEcomName, getEcomOrderID, getStatusBadge } from 'src/utils'
 import OrderManualCreate from 'src/views/modals/OrderManualCreate'
 
 const OrderListAdmin = () => {
@@ -60,6 +62,10 @@ const OrderListAdmin = () => {
   const [selectedOrderID, setSelectedOrderID] = useState('')
   const [selectedOrderData, setSelectedOrderData] = useState({})
 
+  const [platformIDValue, setPlatformIDValue] = useState('')
+  const [pidIsLoading, setPidIsLoading] = useState(false)
+  const [pidErrMsg, setPidErrMsg] = useState('')
+
   const axiosPrivate = useAxiosPrivate()
 
   const fetchData = () => {
@@ -82,7 +88,46 @@ const OrderListAdmin = () => {
 
   useEffect(() => {
     fetchData()
+    setPlatformIDValue()
   }, [selectedFilter])
+
+  const handleKeyUp = (e) => {
+    if (e.key === 'Enter') {
+      fetchPIDData()
+    }
+  }
+  const handleSearchButtonClick = () => {
+    fetchPIDData()
+  }
+
+  const fetchPIDData = () => {
+    if (!platformIDValue) {
+      return
+    }
+
+    setPidIsLoading(true)
+    setPidErrMsg('')
+    axiosPrivate
+      .post('/api_order/get_by_ecom_id', {
+        payload: platformIDValue,
+      })
+      .then((response) => {
+        console.log(response.data)
+        setPidIsLoading(false)
+        handleGoToOrderDetail(response.data.id)
+      })
+      .catch((err) => {
+        console.error('Error fetching order list', err)
+        setPidErrMsg(err.response.data.detail)
+        setPidIsLoading(false)
+      })
+  }
+
+  const handlePlatformIDChange = (e) => {
+    setPidErrMsg('')
+    const inputValue = e.target.value.replace(/\s/g, '')
+    setPlatformIDValue(inputValue)
+  }
 
   const handleFilterChange = (filter) => {
     if (filter.name !== selectedFilter.name) {
@@ -117,6 +162,45 @@ const OrderListAdmin = () => {
 
   return (
     <>
+      <CCard className="mb-2">
+        <CCardHeader>
+          <CRow className="align-items-center justify-content-between">
+            <CCol xs="auto">
+              <h5 style={{ marginBottom: 0 }}>Search by Platform ID</h5>
+            </CCol>
+          </CRow>
+        </CCardHeader>
+        <CCardBody>
+          <CRow>
+            <CCol xs={12}>
+              <CInputGroup className="w-100">
+                <CFormInput
+                  style={{ boxShadow: '0 0 transparent' }}
+                  size="sm"
+                  placeholder="Plaform ID"
+                  value={platformIDValue}
+                  onChange={handlePlatformIDChange}
+                  onKeyUp={handleKeyUp}
+                  disabled={pidIsLoading}
+                />
+                <CButton
+                  type="button"
+                  color="primary"
+                  disabled={pidIsLoading}
+                  onClick={handleSearchButtonClick}
+                >
+                  <CIcon icon={cilSearch} />
+                </CButton>
+              </CInputGroup>
+            </CCol>
+          </CRow>
+          {pidErrMsg && (
+            <CCol xs={12} className="mt-2">
+              <CAlert color="danger">{pidErrMsg}</CAlert>
+            </CCol>
+          )}
+        </CCardBody>
+      </CCard>
       <CCard>
         <CCardHeader>
           <CRow className="align-items-center justify-content-between">
@@ -178,6 +262,9 @@ const OrderListAdmin = () => {
                         Platform
                       </CTableHeaderCell>
                       <CTableHeaderCell className="text-center" scope="col">
+                        Platform ID
+                      </CTableHeaderCell>
+                      <CTableHeaderCell className="text-center" scope="col">
                         Deadline
                       </CTableHeaderCell>
                       <CTableHeaderCell className="text-center" scope="col">
@@ -185,9 +272,6 @@ const OrderListAdmin = () => {
                       </CTableHeaderCell>
                       <CTableHeaderCell className="text-center" scope="col">
                         PIC
-                      </CTableHeaderCell>
-                      <CTableHeaderCell className="text-center" scope="col">
-                        Last Updated
                       </CTableHeaderCell>
                       <CTableHeaderCell className="text-center" scope="col">
                         Action
@@ -213,6 +297,9 @@ const OrderListAdmin = () => {
                           {getEcomName(data.order.ecommerce_code)}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
+                          {getEcomOrderID(data.order)}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
                           {data.order.user_deadline_prd
                             ? `${data.order.user_deadline_prd.slice(
                                 0,
@@ -228,9 +315,6 @@ const OrderListAdmin = () => {
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {data.pic_username || '-'}
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          {formatTStoPrettyString(data.order.last_updated_ts)}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <CDropdown style={{ cursor: 'pointer' }}>

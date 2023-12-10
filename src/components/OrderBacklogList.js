@@ -22,18 +22,17 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROLE_NAMES } from 'src/constant'
 import {
-  formatTStoPrettyString,
   getEcomName,
   getStatusBadge,
   formatPeriodToString,
   getImageURLorNoImg,
+  getEcomOrderID,
 } from 'src/utils'
 
 const OrderBacklogList = ({
   roleID,
   isLoading,
   orderList,
-  openPICModal,
   openOrderInitialDataCreateModal,
   openPICToMeModal,
   openImageViewModal,
@@ -42,6 +41,8 @@ const OrderBacklogList = ({
 
   const dataToRender = orderList || []
   const filteredOrders = dataToRender.filter((data) => data.order.pic_user_id === null)
+
+  console.log(filteredOrders)
 
   const handleGoToOrderDetail = (orderId) => {
     navigate(`/order_detail/${orderId}`)
@@ -73,6 +74,9 @@ const OrderBacklogList = ({
                       Platform
                     </CTableHeaderCell>
                     <CTableHeaderCell className="text-center" scope="col">
+                      Platform ID
+                    </CTableHeaderCell>
+                    <CTableHeaderCell className="text-center" scope="col">
                       Deadline
                     </CTableHeaderCell>
                     <CTableHeaderCell className="text-center" scope="col">
@@ -80,9 +84,6 @@ const OrderBacklogList = ({
                     </CTableHeaderCell>
                     <CTableHeaderCell className="text-center" scope="col">
                       PIC
-                    </CTableHeaderCell>
-                    <CTableHeaderCell className="text-center" scope="col">
-                      Last Updated
                     </CTableHeaderCell>
                     <CTableHeaderCell className="text-center" scope="col">
                       Action
@@ -136,6 +137,9 @@ const OrderBacklogList = ({
                         {getEcomName(data.order.ecommerce_code)}
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
+                        {getEcomOrderID(data.order)}
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
                         {formatPeriodToString(data.order.user_deadline_prd)}
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
@@ -143,9 +147,6 @@ const OrderBacklogList = ({
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
                         {data.pic_username || '-'}
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        {formatTStoPrettyString(data.order.last_updated_ts)}
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
                         <CDropdown style={{ cursor: 'pointer' }}>
