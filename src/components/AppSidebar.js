@@ -1,12 +1,13 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { CSidebar, CSidebarBrand, CSidebarNav, CSidebarToggler } from '@coreui/react'
+import { CImage, CSidebar, CSidebarBrand, CSidebarNav } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 
 import { AppSidebarNav } from './AppSidebarNav'
 
 import { logoNegative } from 'src/assets/brand/logo-negative'
+import herculexLogo from '../assets/images/herc.png'
 import { sygnet } from 'src/assets/brand/sygnet'
 
 import SimpleBar from 'simplebar-react'
@@ -43,6 +44,7 @@ const AppSidebar = () => {
     >
       <CSidebarBrand className="d-none d-md-flex" to="/">
         {/* <CIcon className="sidebar-brand-full" icon={logoNegative} height={35} /> */}
+        <CImage className="sidebar-brand-full" src={herculexLogo} alt="Logo" height={100} />
         <CIcon className="sidebar-brand-narrow" icon={sygnet} height={35} />
       </CSidebarBrand>
       <CSidebarNav>

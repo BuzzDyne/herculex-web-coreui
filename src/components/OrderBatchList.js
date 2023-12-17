@@ -16,7 +16,7 @@ import {
 } from '@coreui/react'
 import { cilFolderOpen } from '@coreui/icons'
 import React, { useEffect, useState } from 'react'
-import { formatTStoPrettyString, getImageURLorNoImg } from 'src/utils'
+import { formatTStoPrettyString, getColorBasedOnDeadline, getImageURLorNoImg } from 'src/utils'
 import CIcon from '@coreui/icons-react'
 import 'src/assets/css/styles.css'
 import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
@@ -183,6 +183,9 @@ const OrderBatchList = ({ compType }) => {
                                       onClick={() => handleGoToOrderDetail(order.id)}
                                       style={{
                                         cursor: 'pointer',
+                                        color: getColorBasedOnDeadline(
+                                          data.order.user_deadline_prd,
+                                        ),
                                       }}
                                     >
                                       Order #{order.id}

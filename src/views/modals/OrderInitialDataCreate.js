@@ -249,7 +249,7 @@ const OrderInitialDataCreate = ({ isOpen, onClose, orderID }) => {
                 />
               </CCol>
               <CCol md={12}>
-                <div style={{ marginBottom: '8px' }}>Date</div>
+                <div style={{ marginBottom: '8px' }}>Deadline</div>
                 <CInputGroup>
                   <CFormInput
                     type="text"

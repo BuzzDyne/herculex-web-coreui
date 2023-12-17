@@ -5,6 +5,10 @@ import {
   CCardText,
   CCardTitle,
   CCol,
+  CDropdown,
+  CDropdownItem,
+  CDropdownMenu,
+  CDropdownToggle,
   CImage,
   CRow,
   CSpinner,
@@ -20,6 +24,7 @@ import { cibWhatsapp, cilFolderOpen, cilCopy } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import {
   formatPeriodToString,
+  getColorBasedOnDeadline,
   getEcomBadge,
   getEcomOrderID,
   getImageURLorNoImg,
@@ -27,6 +32,7 @@ import {
 } from 'src/utils'
 import useAuth from 'src/hooks/useAuth'
 import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
+import OrderUpdateThumb from 'src/views/modals/OrderUpdateThumb'
 
 const OrderDetail = () => {
   const { id } = useParams()
@@ -45,6 +51,16 @@ const OrderDetail = () => {
   const [copied, setCopied] = useState(false)
 
   const [isLoading, setIsLoading] = useState(false)
+
+  const [refreshDataFlag, setRefreshDataFlag] = useState(false)
+  const toggleRefreshDataFlag = () => {
+    setRefreshDataFlag((prevFlag) => !prevFlag)
+  }
+
+  const [isUpdateThumbModalOpen, setIsUpdateThumbModalOpen] = useState(false)
+  const openDesignLinksModal = () => {
+    setIsUpdateThumbModalOpen(true)
+  }
 
   useEffect(() => {
     setIsLoading(true)
@@ -73,7 +89,7 @@ const OrderDetail = () => {
         }
         navigate('/500')
       })
-  }, [id])
+  }, [id, refreshDataFlag])
 
   const handleCopy = () => {
     navigator.clipboard
@@ -123,7 +139,9 @@ const OrderDetail = () => {
               <CCard style={{ height: '100%' }}>
                 <CCardBody className="py-2">
                   <CCardTitle className="fw-bold fs-3">
-                    Order #{id}
+                    <span style={{ color: getColorBasedOnDeadline(order.user_deadline_prd) }}>
+                      Order #{id}
+                    </span>
                     <span className="ms-1" style={{ fontSize: 'medium' }}>
                       {getEcomBadge(order.ecommerce_code)}
                     </span>
@@ -201,6 +219,19 @@ const OrderDetail = () => {
                           <CIcon icon={cilFolderOpen} />
                         </CButton>
                       </CCol>
+                      <CCol xs={'auto'} className="ps-0">
+                        <CDropdown style={{ cursor: 'pointer' }}>
+                          <CDropdownToggle color="primary" size="sm" />
+                          <CDropdownMenu>
+                            <CDropdownItem
+                              style={{ fontSize: 'small' }}
+                              onClick={() => openDesignLinksModal()}
+                            >
+                              Set Thumbnail
+                            </CDropdownItem>
+                          </CDropdownMenu>
+                        </CDropdown>
+                      </CCol>
                     </CRow>
                   </CCardText>
                 </CCardBody>
@@ -238,6 +269,15 @@ const OrderDetail = () => {
           </CRow>
         </>
       )}
+
+      <OrderUpdateThumb
+        isOpen={isUpdateThumbModalOpen}
+        onClose={() => {
+          setIsUpdateThumbModalOpen(false)
+          toggleRefreshDataFlag()
+        }}
+        orderData={order}
+      />
     </>
   )
 }

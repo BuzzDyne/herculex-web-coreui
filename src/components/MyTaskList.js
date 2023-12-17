@@ -16,7 +16,12 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { INTERNAL_ORDER_STATUS } from 'src/constant'
 import useAuth from 'src/hooks/useAuth'
-import { getStatusBadge, formatPeriodToString, openWhatsappChat } from 'src/utils'
+import {
+  getStatusBadge,
+  formatPeriodToString,
+  openWhatsappChat,
+  getColorBasedOnDeadline,
+} from 'src/utils'
 
 const MyTaskList = ({
   isLoading,
@@ -134,6 +139,7 @@ const MyTaskList = ({
                             onClick={() => handleGoToOrderDetail(data.order.id)}
                             style={{
                               cursor: 'pointer',
+                              color: getColorBasedOnDeadline(data.order.user_deadline_prd),
                             }}
                           >
                             Order #{data.order.id}

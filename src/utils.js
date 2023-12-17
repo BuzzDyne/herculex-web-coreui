@@ -1,6 +1,42 @@
 import { CBadge } from '@coreui/react'
 import { INTERNAL_ORDER_STATUS } from './constant'
 
+export const getColorBasedOnDeadline = (deadlineDate, currentDate = '') => {
+  if (!currentDate) {
+    currentDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  }
+
+  if (!deadlineDate) {
+    return 'black'
+  }
+
+  const parseDate = (dateString) => {
+    const year = parseInt(dateString.substring(0, 4), 10)
+    const month = parseInt(dateString.substring(4, 6), 10) - 1 // Month is 0-based
+    const day = parseInt(dateString.substring(6, 8), 10)
+    return new Date(year, month, day)
+  }
+
+  const deadlineTimestamp = parseDate(deadlineDate).getTime()
+  const currentTimestamp = parseDate(currentDate).getTime()
+
+  if (isNaN(deadlineTimestamp) || isNaN(currentTimestamp)) {
+    // Handle invalid date format
+    console.error('Invalid date format. Deadline:', deadlineDate, 'Current date:', currentDate)
+    return 'black'
+  }
+
+  const timeDiff = Math.floor((deadlineTimestamp - currentTimestamp) / (24 * 60 * 60 * 1000))
+
+  if (timeDiff === 0) {
+    return '#CC3300'
+  } else if (timeDiff <= 2) {
+    return '#FF9900'
+  } else {
+    return 'black'
+  }
+}
+
 export const getEcomName = (ecommerce_code) => {
   switch (ecommerce_code) {
     case 'T':

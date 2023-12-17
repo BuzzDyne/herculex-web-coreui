@@ -27,6 +27,7 @@ import {
   formatPeriodToString,
   getImageURLorNoImg,
   getEcomOrderID,
+  getColorBasedOnDeadline,
 } from 'src/utils'
 
 const OrderBacklogList = ({
@@ -47,6 +48,8 @@ const OrderBacklogList = ({
   const handleGoToOrderDetail = (orderId) => {
     navigate(`/order_detail/${orderId}`)
   }
+
+  const currentDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
 
   return (
     <>
@@ -98,7 +101,10 @@ const OrderBacklogList = ({
                           onClick={() => handleGoToOrderDetail(data.order.id)}
                           style={{
                             cursor: 'pointer',
-                            color: 'blue',
+                            color: getColorBasedOnDeadline(
+                              data.order.user_deadline_prd,
+                              currentDate,
+                            ),
                             textDecoration: 'underline',
                           }}
                         >
