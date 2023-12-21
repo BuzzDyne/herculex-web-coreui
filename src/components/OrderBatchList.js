@@ -183,9 +183,7 @@ const OrderBatchList = ({ compType }) => {
                                       onClick={() => handleGoToOrderDetail(order.id)}
                                       style={{
                                         cursor: 'pointer',
-                                        color: getColorBasedOnDeadline(
-                                          data.order.user_deadline_prd,
-                                        ),
+                                        color: getColorBasedOnDeadline(order.user_deadline_prd),
                                       }}
                                     >
                                       Order #{order.id}
