@@ -26,6 +26,7 @@ const AppHeaderDropdown = () => {
 
   const handleLogout = async () => {
     setAuth({})
+    localStorage.removeItem('auth') // Clear authentication state from localStorage
     navigate('/login', { replace: true })
   }
 
