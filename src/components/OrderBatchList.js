@@ -14,7 +14,7 @@ import {
   CRow,
   CSpinner,
 } from '@coreui/react'
-import { cilFolderOpen } from '@coreui/icons'
+import { cilFolderOpen, cilCopy } from '@coreui/icons'
 import React, { useEffect, useState } from 'react'
 import { formatTStoPrettyString, getColorBasedOnDeadline, getImageURLorNoImg } from 'src/utils'
 import CIcon from '@coreui/icons-react'
@@ -31,6 +31,7 @@ const OrderBatchList = ({ compType }) => {
   const [axiosErrMsg, setAxiosErrMsg] = useState('')
   const [refreshDataFlag, setRefreshDataFlag] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState({})
+  const [copied, setCopied] = useState(false)
   const toggleRefreshDataFlag = () => {
     setRefreshDataFlag((prevFlag) => !prevFlag)
   }
@@ -80,6 +81,18 @@ const OrderBatchList = ({ compType }) => {
     navigate(`/order_detail/${orderId}`)
   }
 
+  const handleCopy = (copiedText) => {
+    navigator.clipboard
+      .writeText(`Batch ${copiedText}`)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000) // Reset the "copied" state after 2 seconds
+      })
+      .catch((error) => {
+        console.error('Error copying to clipboard:', error)
+      })
+  }
+
   return (
     <>
       <CCard className="text-center mb-4">
@@ -116,6 +129,15 @@ const OrderBatchList = ({ compType }) => {
                             <CCol xs={12}>
                               <CCardTitle className="mb-1" style={{ textAlign: 'left' }}>
                                 Batch {batch.batch_name}
+                                <CButton
+                                  className="ms-0"
+                                  onClick={() => handleCopy(batch.batch_name)}
+                                  size="sm"
+                                  variant="outlined"
+                                  color="dark"
+                                >
+                                  <CIcon icon={cilCopy} />
+                                </CButton>
                               </CCardTitle>
                             </CCol>
                             <CCol xs={12}>
