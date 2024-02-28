@@ -127,6 +127,41 @@ export const getEcomOrderID = (orderData) => {
   }
 }
 
+export const getDocTypeName = (docTypeCode) => {
+  const docTypeMap = {
+    I: 'Invoice',
+    Q: 'Quotation',
+  }
+
+  return docTypeMap[docTypeCode] || 'Other'
+}
+
+export const isYYYYMMDDInvalid = (yyyy, mm, dd) => {
+  const year = parseInt(yyyy)
+  const month = parseInt(mm) - 1 // Months are 0-based
+  const day = parseInt(dd)
+  const date = new Date(Date.UTC(year, month, day, 0, 0, 0, 0))
+
+  return (
+    isNaN(date.getTime()) ||
+    date.getDate() !== day ||
+    date.getMonth() !== month ||
+    date.getUTCFullYear() !== year
+  )
+}
+
+export const performDownloadFromResponse = (response, filename) => {
+  const blobUrl = window.URL.createObjectURL(new Blob([response.data]))
+
+  // Create an anchor element to trigger the download
+  const link = document.createElement('a')
+  link.href = blobUrl
+  link.download = `${filename}.pdf`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 export const getImageURLorNoImg = (imageURL) =>
   imageURL ? imageURL : 'https://placehold.co/400?text=No+Image'
 

@@ -18,6 +18,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useAuth from '../../hooks/useAuth'
+import { isYYYYMMDDInvalid } from 'src/utils'
 
 const OrderInitialDataCreate = ({ isOpen, onClose, orderID }) => {
   const { auth } = useAuth()
@@ -158,20 +159,9 @@ const OrderInitialDataCreate = ({ isOpen, onClose, orderID }) => {
       return
     }
 
-    // Create a date object using the entered values (in GMT+7 timezone)
-    const year = parseInt(formYYYYValue)
-    const month = parseInt(formMMValue) - 1 // Months are 0-based
-    const day = parseInt(formDDValue)
-    const date = new Date(Date.UTC(year, month, day, 0, 0, 0, 0))
-
     const dateStr = `${formYYYYValue}${formMMValue.padStart(2, '0')}${formDDValue.padStart(2, '0')}`
     // Check if the date is valid
-    if (
-      isNaN(date.getTime()) ||
-      date.getDate() !== day ||
-      date.getMonth() !== month ||
-      date.getUTCFullYear() !== year
-    ) {
+    if (isYYYYMMDDInvalid(formYYYYValue, formMMValue, formDDValue)) {
       setformDateErrorMsg(`"${dateStr}" is not a valid date!`)
       setIsLoading(false)
       return

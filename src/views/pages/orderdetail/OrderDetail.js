@@ -20,7 +20,7 @@ import OrderCommentList from 'src/components/OrderCommentList'
 import OrderDetailListItem from 'src/components/OrderDetailListItem'
 import OrderHistoryList from 'src/components/OrderHistoryList'
 import CustomStackedProgressBar from 'src/components/OrderProgressBar'
-import { cibWhatsapp, cilFolderOpen, cilCopy } from '@coreui/icons'
+import { cibWhatsapp, cilFolderOpen, cilCopy, cilPen } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import {
   formatPeriodToString,
@@ -29,10 +29,14 @@ import {
   getEcomOrderID,
   getImageURLorNoImg,
   openWhatsappChat,
+  performDownloadFromResponse,
 } from 'src/utils'
 import useAuth from 'src/hooks/useAuth'
 import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
 import OrderUpdateThumb from 'src/views/modals/OrderUpdateThumb'
+import DocumentCreateInvoiceModal from 'src/views/modals/DocumentCreateInvoiceModal'
+import DocumentCreateQuotationModal from 'src/views/modals/DocumentCreateQuotationModal'
+import DocumentEditModal from 'src/views/modals/DocumentEditModal'
 
 const OrderDetail = () => {
   const { id } = useParams()
@@ -46,6 +50,8 @@ const OrderDetail = () => {
   const [orderTrackings, setOrderTrackings] = useState([])
   const [picUsername, setPicUsername] = useState('')
   const [batchName, setBatchName] = useState('')
+  const [invoiceDocID, setInvoiceDocID] = useState()
+  const [quotationDocID, setQuotationDocID] = useState()
 
   const ecomOrderID = getEcomOrderID(order)
   const [copied, setCopied] = useState(false)
@@ -61,11 +67,38 @@ const OrderDetail = () => {
   const openDesignLinksModal = () => {
     setIsUpdateThumbModalOpen(true)
   }
+  const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false)
+  const openCreateInvoiceModal = () => {
+    setIsCreateInvoiceModalOpen(true)
+  }
+  const [isCreateQuotationModalOpen, setIsCreateQuotationModalOpen] = useState(false)
+  const openCreateQuotationModal = () => {
+    setIsCreateQuotationModalOpen(true)
+  }
+  const [isEditDocModalOpen, setIsEditDocModalOpen] = useState(false)
+  const [docIdSelected, setDocIdSelected] = useState()
+  const openEditDocModal = (doc_id) => {
+    setDocIdSelected(doc_id)
+    setIsEditDocModalOpen(true)
+  }
 
   useEffect(() => {
     setIsLoading(true)
 
     const api_path = `/api_order/id/${id}`
+    const doc_api_path = `/api_docs/inquiry/order_id/${id}`
+
+    axiosPrivate
+      .get(doc_api_path)
+      .then((response) => {
+        setInvoiceDocID(response.data.latest_invoice_id)
+        setQuotationDocID(response.data.latest_quote_id)
+      })
+      .catch((err) => {
+        console.error('Error fetching OrderDocs', err)
+        setInvoiceDocID(null)
+        setQuotationDocID(null)
+      })
 
     axiosPrivate
       .get(api_path)
@@ -100,6 +133,20 @@ const OrderDetail = () => {
       })
       .catch((error) => {
         console.error('Error copying to clipboard:', error)
+      })
+  }
+
+  const getDownloadPDF = async (doc_id, filename) => {
+    axiosPrivate
+      .get(`/api_docs/download/id/${doc_id}`, {
+        responseType: 'blob',
+      })
+      .then((response) => {
+        // Create a blob URL for the PDF file
+        performDownloadFromResponse(response, filename)
+      })
+      .catch((err) => {
+        console.error(`Error downloading docID ${doc_id}`, err)
       })
   }
 
@@ -170,6 +217,38 @@ const OrderDetail = () => {
                           <b>Deadline</b>: <br className="d-xs-block d-sm-none" />
                           {formatPeriodToString(order.user_deadline_prd)}
                         </div>
+                        {auth.token_role_id === 1 && (
+                          <div>
+                            <b>Quotation</b>: <br className="d-xs-block d-sm-none" />
+                            {quotationDocID ? (
+                              <>
+                                <CButton
+                                  size="sm"
+                                  color="dark"
+                                  className="me-1"
+                                  onClick={() => getDownloadPDF(quotationDocID, 'Quotation')}
+                                >
+                                  Download
+                                </CButton>
+                                <CButton
+                                  size="sm"
+                                  color="warning"
+                                  onClick={() => openEditDocModal(quotationDocID)}
+                                >
+                                  <CIcon icon={cilPen} />
+                                </CButton>
+                              </>
+                            ) : (
+                              <CButton
+                                size="sm"
+                                color="dark"
+                                onClick={() => openCreateQuotationModal()}
+                              >
+                                Create
+                              </CButton>
+                            )}
+                          </div>
+                        )}
                       </CCol>
                       <CCol>
                         <div>
@@ -184,6 +263,38 @@ const OrderDetail = () => {
                           <b>Current PIC</b>: <br className="d-xs-block d-sm-none" />
                           {picUsername || '-'}
                         </div>
+                        {auth.token_role_id === 1 && (
+                          <div>
+                            <b>Invoice</b>: <br className="d-xs-block d-sm-none" />
+                            {invoiceDocID ? (
+                              <>
+                                <CButton
+                                  size="sm"
+                                  color="dark"
+                                  className="me-1"
+                                  onClick={() => getDownloadPDF(invoiceDocID, 'Invoice')}
+                                >
+                                  Download
+                                </CButton>
+                                <CButton
+                                  size="sm"
+                                  color="warning"
+                                  onClick={() => openEditDocModal(invoiceDocID)}
+                                >
+                                  <CIcon icon={cilPen} />
+                                </CButton>
+                              </>
+                            ) : (
+                              <CButton
+                                size="sm"
+                                color="dark"
+                                onClick={() => openCreateInvoiceModal()}
+                              >
+                                Create
+                              </CButton>
+                            )}
+                          </div>
+                        )}
                       </CCol>
                     </CRow>
                   </CCardText>
@@ -277,6 +388,32 @@ const OrderDetail = () => {
           toggleRefreshDataFlag()
         }}
         orderData={order}
+      />
+      <DocumentCreateInvoiceModal
+        order_id={id}
+        order_items_data={orderItems}
+        isOpen={isCreateInvoiceModalOpen}
+        onClose={() => {
+          setIsCreateInvoiceModalOpen(false)
+          toggleRefreshDataFlag()
+        }}
+      />
+      <DocumentCreateQuotationModal
+        order_id={id}
+        order_items_data={orderItems}
+        isOpen={isCreateQuotationModalOpen}
+        onClose={() => {
+          setIsCreateQuotationModalOpen(false)
+          toggleRefreshDataFlag()
+        }}
+      />
+      <DocumentEditModal
+        doc_id={docIdSelected}
+        isOpen={isEditDocModalOpen}
+        onClose={() => {
+          setIsEditDocModalOpen(false)
+          toggleRefreshDataFlag()
+        }}
       />
     </>
   )

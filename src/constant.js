@@ -22,3 +22,10 @@ export const INTERNAL_ORDER_STATUS = {
   '400': { name: 'Packing', colorname: 'primary', buttonText: 'Done Packing' }, 
   '999': { name: 'Complete', colorname: 'success', buttonText: '' },
 }
+
+export const DocModalTypes = {
+  EDIT: 'EDIT',
+  CREATE_INVOICE: 'CREATE_INVOICE',
+  CREATE_QUOTATION: 'CREATE_QUOTATION',
+  CREATE_MANUAL: 'CREATE_MANUAL',
+}

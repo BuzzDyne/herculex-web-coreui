@@ -21,6 +21,7 @@ const UserMgmt = React.lazy(() => import('./views/pages/usermgmt/UserMgmt'))
 const OrderListAdmin = React.lazy(() => import('./views/pages/orderlistadmin/OrderListAdmin'))
 const OrderDetail = React.lazy(() => import('./views/pages/orderdetail/OrderDetail'))
 const BatchList = React.lazy(() => import('./views/pages/batchlist/BatchList'))
+const DocList = React.lazy(() => import('./views/pages/documentlist/DocumentList'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home', isPrivate: true },
@@ -30,6 +31,7 @@ const routes = [
   { path: '/theme', name: 'Theme', element: Colors, exact: true, isPrivate: true },
   { path: '/user_management', name: 'User Management', element: UserMgmt, isPrivate: true },
   { path: '/batch_list', name: 'BatchList', element: BatchList, isPrivate: true },
+  { path: '/doc_list', name: 'Document List', element: DocList, isPrivate: true },
   { path: '/icons', exact: true, name: 'Icons', element: CoreUIIcons, isPrivate: true },
   { path: '/icons/coreui-icons', name: 'CoreUI Icons', element: CoreUIIcons, isPrivate: true },
   { path: '/icons/flags', name: 'Flags', element: Flags, isPrivate: true },
