@@ -40,7 +40,7 @@ const DocumentForm = ({
 
   const [formOrderIDValue, setFormOrderIDValue] = useState('')
   const [formOrderIDValueErrorMsg, setFormOrderIDValueErrorMsg] = useState('')
-  const [formDocTypeCodeValue, setFormDocTypeCodeValue] = useState('I')
+  const [formDocTypeCodeValue, setFormDocTypeCodeValue] = useState('')
   const [formDocTypeCodeValueErrorMsg, setFormDocTypeCodeValueErrorMsg] = useState('')
   const [formDocNumberValue, setFormDocNumberValue] = useState('')
   const [formDocNumberValueErrorMsg, setFormDocNumberValueErrorMsg] = useState('')
@@ -71,7 +71,7 @@ const DocumentForm = ({
   const [formDateErrorMsg, setformDateErrorMsg] = useState(false)
 
   const [formItems, setFormItems] = useState([
-    { id: 0, name: '', nameErr: false, qty: '', qtyErr: false, price: '', priceErr: false },
+    { id: 0, name: '', nameErr: false, qty: 0, qtyErr: false, price: 0, priceErr: false },
   ])
 
   useEffect(() => {
@@ -79,6 +79,7 @@ const DocumentForm = ({
       switch (docModalType) {
         case DocModalTypes.CREATE_MANUAL:
           setDueDateToday()
+          setFormDocTypeCodeValue('I')
           setFormDocNumberValue(generateDocNo('INV', 'XXXX'))
           break
         case DocModalTypes.CREATE_INVOICE:
@@ -106,7 +107,9 @@ const DocumentForm = ({
   }, [isOpen])
 
   useEffect(() => {
-    populateDocData()
+    if (docData) {
+      populateDocData()
+    }
   }, [docData])
 
   const handleSubmit = () => {
@@ -149,18 +152,18 @@ const DocumentForm = ({
           doc_type: formDocTypeCodeValue,
           doc_number: formDocNumberValue,
           customer_name: formCustName,
-          customer_addr_1: formCustomerAddr1,
-          customer_addr_2: formCustomerAddr2,
-          customer_addr_3: formCustomerAddr3,
-          customer_addr_4: formCustomerAddr4,
-          cust_phone: formCustPhone,
-          cust_fax: formCustFax,
+          customer_addr_1: formCustomerAddr1 || '',
+          customer_addr_2: formCustomerAddr2 || '',
+          customer_addr_3: formCustomerAddr3 || '',
+          customer_addr_4: formCustomerAddr4 || '',
+          cust_phone: formCustPhone || '',
+          cust_fax: formCustFax || '',
           due_date: dateStr,
           discount: parseFloat(formDiscount) || 0,
           items: formItems.map((item) => ({
             item_name: item.name,
-            item_price: parseFloat(item.price) || 0, // Assuming price can be a float, handle accordingly
-            item_qty: parseInt(item.qty) || 0, // Assuming qty is an integer, handle accordingly
+            item_price: parseFloat(item.price),
+            item_qty: parseInt(item.qty),
           })),
         })
         .then((response) => {
@@ -181,18 +184,18 @@ const DocumentForm = ({
           doc_type: formDocTypeCodeValue,
           doc_number: formDocNumberValue,
           customer_name: formCustName,
-          customer_addr_1: formCustomerAddr1,
-          customer_addr_2: formCustomerAddr2,
-          customer_addr_3: formCustomerAddr3,
-          customer_addr_4: formCustomerAddr4,
-          cust_phone: formCustPhone,
-          cust_fax: formCustFax,
+          customer_addr_1: formCustomerAddr1 || '',
+          customer_addr_2: formCustomerAddr2 || '',
+          customer_addr_3: formCustomerAddr3 || '',
+          customer_addr_4: formCustomerAddr4 || '',
+          cust_phone: formCustPhone || '',
+          cust_fax: formCustFax || '',
           due_date: dateStr,
           discount: parseFloat(formDiscount) || 0,
           items: formItems.map((item) => ({
             item_name: item.name,
-            item_price: parseFloat(item.price) || 0, // Assuming price can be a float, handle accordingly
-            item_qty: parseInt(item.qty) || 0, // Assuming qty is an integer, handle accordingly
+            item_price: parseFloat(item.price),
+            item_qty: parseInt(item.qty),
           })),
         })
         .then((response) => {
@@ -283,7 +286,7 @@ const DocumentForm = ({
     const updatedFormItems = formItems.map((item) => {
       let newItem = { ...item }
 
-      if (newItem.name.trim() === '') {
+      if (newItem.name.trim() === '' || newItem.name.length > 60) {
         newItem.nameErr = true
         isFailedValidation = true
       } else {
@@ -336,6 +339,10 @@ const DocumentForm = ({
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...formItems]
+
+    if (field === 'price' || field === 'qty') {
+      value = isNaN(parseInt(value)) ? 0 : parseInt(value)
+    }
     newItems[index][field] = value
 
     newItems[index].nameErr = false
@@ -349,7 +356,7 @@ const DocumentForm = ({
     if (formItems.length < 19) {
       setFormItems([
         ...formItems,
-        { name: '', nameErr: false, qty: '', qtyErr: false, price: '', priceErr: false },
+        { name: '', nameErr: false, qty: 0, qtyErr: false, price: 0, priceErr: false },
       ])
     }
   }
@@ -459,7 +466,7 @@ const DocumentForm = ({
   const handleCustPhoneChange = (e) => {
     const phone = e.target.value
     const maxLength = 30
-    const phoneRegex = /^[0-9()-]+$/
+    const phoneRegex = /^[0-9()-]*$/
 
     // Validation checks
     if (phone.length > maxLength) {
@@ -476,7 +483,7 @@ const DocumentForm = ({
   const handleCustFaxChange = (e) => {
     const fax = e.target.value
     const maxLength = 30
-    const phoneRegex = /^[0-9()-]+$/
+    const phoneRegex = /^[0-9()-]*$/
 
     // Validation checks
     if (fax.length > maxLength) {
@@ -582,7 +589,7 @@ const DocumentForm = ({
     setFormMMErrorMsg('')
     setFormDDValue('')
     setFormDDErrorMsg('')
-    setFormItems([{ name: '', nameErr: false, qty: '', qtyErr: false, price: '', priceErr: false }])
+    setFormItems([{ name: '', nameErr: false, qty: 0, qtyErr: false, price: 0, priceErr: false }])
   }
 
   return (
