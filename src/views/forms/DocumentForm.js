@@ -552,6 +552,17 @@ const DocumentForm = ({
     setFormDDValue(day)
   }
 
+  const handleDisableWheel = (e) => {
+    e.currentTarget.blur()
+    console.log('inside handleDisableWheel')
+  }
+
+  const handleDisabledUpDownNumeric = (e) => {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault()
+    }
+  }
+
   const closeSelf = () => {
     if (isLoading) {
       return
@@ -724,6 +735,8 @@ const DocumentForm = ({
                   required
                   label="Customer Phone"
                   value={formCustPhone}
+                  onWheel={handleDisableWheel}
+                  onKeyDown={handleDisabledUpDownNumeric}
                   onChange={handleCustPhoneChange}
                 />
               </CCol>
@@ -736,6 +749,8 @@ const DocumentForm = ({
                   required
                   label="Customer Fax"
                   value={formCustFax}
+                  onWheel={handleDisableWheel}
+                  onKeyDown={handleDisabledUpDownNumeric}
                   onChange={handleCustFaxChange}
                 />
               </CCol>
@@ -748,6 +763,8 @@ const DocumentForm = ({
                   required
                   label="Discount"
                   value={formDiscount}
+                  onWheel={handleDisableWheel}
+                  onKeyDown={handleDisabledUpDownNumeric}
                   onChange={handleDiscountChange}
                 />
               </CCol>
@@ -760,6 +777,8 @@ const DocumentForm = ({
                     placeholder="YYYY"
                     value={formYYYYValue}
                     invalid={formYYYYErrorMsg !== ''}
+                    onWheel={handleDisableWheel}
+                    onKeyDown={handleDisabledUpDownNumeric}
                     onChange={handleYYYYChange}
                   />
                   <CInputGroupText>/</CInputGroupText>
@@ -769,6 +788,8 @@ const DocumentForm = ({
                     placeholder="MM"
                     value={formMMValue}
                     invalid={formMMErrorMsg !== ''}
+                    onWheel={handleDisableWheel}
+                    onKeyDown={handleDisabledUpDownNumeric}
                     onChange={handleMMChange}
                   />
                   <CInputGroupText>/</CInputGroupText>
@@ -778,6 +799,8 @@ const DocumentForm = ({
                     placeholder="DD"
                     value={formDDValue}
                     invalid={formDDErrorMsg !== ''}
+                    onWheel={handleDisableWheel}
+                    onKeyDown={handleDisabledUpDownNumeric}
                     onChange={handleDDChange}
                   />
                 </CInputGroup>
@@ -810,6 +833,8 @@ const DocumentForm = ({
                         className="hide-number-arrows"
                         label={`Price`}
                         value={item.price}
+                        onWheel={handleDisableWheel}
+                        onKeyDown={handleDisabledUpDownNumeric}
                         onChange={(e) => handleItemChange(index, 'price', e.target.value)}
                         invalid={item.priceErr}
                         placeholder="88.888"
@@ -822,6 +847,8 @@ const DocumentForm = ({
                         className="hide-number-arrows"
                         label={`Qty`}
                         value={item.qty}
+                        onWheel={handleDisableWheel}
+                        onKeyDown={handleDisabledUpDownNumeric}
                         onChange={(e) => handleItemChange(index, 'qty', e.target.value)}
                         invalid={item.qtyErr}
                         placeholder="88"
