@@ -162,6 +162,17 @@ export const performDownloadFromResponse = (response, filename) => {
   document.body.removeChild(link)
 }
 
+export const performPrintFromResponse = (response) => {
+  // Create a blob URL for the PDF content
+  const blobUrl = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+
+  // Open the PDF content in a new window for printing
+  const pdfWindow = window.open(blobUrl)
+
+  // Print the PDF content
+  pdfWindow.print()
+}
+
 export const getImageURLorNoImg = (imageURL) =>
   imageURL ? imageURL : 'https://placehold.co/400?text=No+Image'
 

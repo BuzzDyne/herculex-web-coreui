@@ -19,8 +19,16 @@ import Tooltip from '@mui/material/Tooltip'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 import DeleteIcon from '@mui/icons-material/Delete'
-import FilterListIcon from '@mui/icons-material/FilterList'
+import AddIcon from '@mui/icons-material/Add'
+import EditIcon from '@mui/icons-material/Edit'
+import PrintIcon from '@mui/icons-material/Print'
+import PriceCheckIcon from '@mui/icons-material/PriceCheck'
 import { visuallyHidden } from '@mui/utils'
+import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
+import CIcon from '@coreui/icons-react'
+import { cilCheck } from '@coreui/icons'
+import { CCard, CCardBody, CCardText, CCardTitle, CContainer } from '@coreui/react'
+import ConfirmationModal from 'src/views/modals/ConfirmationModal'
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -65,10 +73,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy)
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index])
   stabilizedThis.sort((a, b) => {
@@ -82,37 +86,15 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  {
-    id: 'name',
-    numeric: false,
-    disablePadding: true,
-    label: 'Dessert (100g serving)',
-  },
-  {
-    id: 'calories',
-    numeric: true,
-    disablePadding: false,
-    label: 'Calories',
-  },
-  {
-    id: 'fat',
-    numeric: true,
-    disablePadding: false,
-    label: 'Fat (g)',
-  },
-  {
-    id: 'carbs',
-    numeric: true,
-    disablePadding: false,
-    label: 'Carbs (g)',
-  },
-  {
-    id: 'protein',
-    numeric: true,
-    disablePadding: false,
-    label: 'Protein (g)',
-  },
+  { id: 'id', numeric: false, disablePadding: true, label: 'ID' },
+  { id: 'created_date', numeric: false, disablePadding: false, label: 'Date' },
+  { id: 'recipient_name', numeric: false, disablePadding: false, label: 'Recipient Name' },
+  { id: 'recipient_address', numeric: false, disablePadding: false, label: 'Recipient Address' },
+  { id: 'order_total', numeric: true, disablePadding: false, label: 'Order Total' },
+  { id: 'print_flag', numeric: false, disablePadding: false, label: 'Print' },
+  { id: 'paid_flag', numeric: false, disablePadding: false, label: 'Paid' },
 ]
+
 function EnhancedTableHead(props) {
   const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props
   const createSortHandler = (property) => (event) => {
@@ -129,7 +111,7 @@ function EnhancedTableHead(props) {
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{
-              'aria-label': 'select all desserts',
+              'aria-label': 'select all orders',
             }}
           />
         </TableCell>
@@ -145,7 +127,7 @@ function EnhancedTableHead(props) {
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
             >
-              {headCell.label}
+              <b>{headCell.label}</b>
               {orderBy === headCell.id ? (
                 <Box component="span" sx={visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
@@ -169,7 +151,7 @@ EnhancedTableHead.propTypes = {
 }
 
 function EnhancedTableToolbar(props) {
-  const { numSelected } = props
+  const { numSelected, onBatchPrintClick, onBatchPaidClick, onBatchDeleteClick } = props
 
   return (
     <Toolbar
@@ -188,20 +170,39 @@ function EnhancedTableToolbar(props) {
         </Typography>
       ) : (
         <Typography sx={{ flex: '1 1 100%' }} variant="h6" id="tableTitle" component="div">
-          Nutrition
+          Orders
         </Typography>
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
+        <>
+          {numSelected === 1 && (
+            <Tooltip title="Edit">
+              <IconButton>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          <Tooltip title="Print">
+            <IconButton onClick={onBatchPrintClick}>
+              <PrintIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Paid">
+            <IconButton onClick={onBatchPaidClick}>
+              <PriceCheckIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <IconButton sx={{ marginLeft: '16px' }} onClick={onBatchDeleteClick}>
+              <DeleteIcon sx={{ color: '#D42136' }} />
+            </IconButton>
+          </Tooltip>
+        </>
       ) : (
-        <Tooltip title="Filter list">
+        <Tooltip title="Add New Order">
           <IconButton>
-            <FilterListIcon />
+            <AddIcon /> {/* TODO Create Order*/}
           </IconButton>
         </Tooltip>
       )}
@@ -211,6 +212,22 @@ function EnhancedTableToolbar(props) {
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
+  onBatchPrintClick: PropTypes.func.isRequired,
+  onBatchPaidClick: PropTypes.func.isRequired,
+  onBatchDeleteClick: PropTypes.func.isRequired,
+}
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toISOString().split('T')[0] // returns yyyy-mm-dd format
+}
+
+const formatCurrency = (amount) => {
+  return amount.toLocaleString('en-US', { style: 'currency', currency: 'IDR' })
+}
+
+const truncateStr = (text, limit) => {
+  return text.length > limit ? text.slice(0, limit) + '...' : text
 }
 
 export default function EnhancedTable() {
@@ -218,8 +235,47 @@ export default function EnhancedTable() {
   const [orderBy, setOrderBy] = React.useState('calories')
   const [selected, setSelected] = React.useState([])
   const [page, setPage] = React.useState(0)
-  const [dense, setDense] = React.useState(false)
-  const [rowsPerPage, setRowsPerPage] = React.useState(5)
+  const [dense, setDense] = React.useState(true)
+  const [rowsPerPage, setRowsPerPage] = React.useState(10)
+  const [userList, setUserList] = React.useState([])
+  const [visibleRows, setVisibleRows] = React.useState([])
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [axiosErrMsg, setAxiosErrMsg] = React.useState('')
+
+  const [isConfirmModalVisible, setIsConfirmModalVisible] = React.useState(false)
+  const [confirmModalData, setConfirmModalData] = React.useState({})
+
+  const axiosPrivate = useAxiosPrivate()
+  React.useEffect(() => {
+    fetchData()
+  }, [])
+
+  React.useEffect(() => {
+    setVisibleRows(
+      stableSort(userList, getComparator(order, orderBy)).slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage,
+      ),
+    )
+  }, [userList, order, orderBy, page, rowsPerPage])
+
+  const fetchData = () => {
+    setIsLoading(true)
+    axiosPrivate
+      .get('/api_orderanku/order?per_page=1000')
+      .then((response) => {
+        setUserList(response.data.sellers) // Adjust to response data structure
+        console.log('Response.Data.Sellers:', response.data.sellers)
+        setAxiosErrMsg('')
+        setIsLoading(false)
+      })
+      .catch((err) => {
+        console.error('Error fetching order list', err)
+        setAxiosErrMsg(err.message)
+        setUserList([])
+        setIsLoading(false)
+      })
+  }
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
@@ -229,7 +285,7 @@ export default function EnhancedTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id)
+      const newSelected = userList.map((n) => n.id)
       setSelected(newSelected)
       return
     }
@@ -271,96 +327,173 @@ export default function EnhancedTable() {
   const isSelected = (id) => selected.indexOf(id) !== -1
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - userList.length) : 0
 
-  const visibleRows = React.useMemo(
-    () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage,
-      ),
-    [order, orderBy, page, rowsPerPage],
-  )
+  if (isLoading) {
+    return <div>Loading...</div> // TODO Use Spinner
+  }
+
+  if (axiosErrMsg) {
+    return <div>Error: {axiosErrMsg}</div> // TODO Show Pretty Alert
+  }
+
+  const openConfirmModal = (data) => {
+    setConfirmModalData(data)
+    setIsConfirmModalVisible(true)
+  }
+
+  const closeConfirmModal = () => {
+    setIsConfirmModalVisible(false)
+    setConfirmModalData({})
+    setSelected([])
+    fetchData()
+  }
+
+  const handleBatchPrint = () => {
+    openConfirmModal({
+      modalTitle: 'Print',
+      modalText: `Are you sure you want to print Order IDs (${selected.join(', ')})?`,
+      modalConfirmText: 'Print',
+      httpMethod: 'DOWNLOAD',
+      httpEndpointURL: '/api_orderanku/order/batch_print',
+      httpPayload: {
+        order_ids: selected,
+      },
+    })
+  }
+
+  const handleBatchPaid = () => {
+    openConfirmModal({
+      modalTitle: 'Paid',
+      modalText: `Are you sure you want to set Order IDs (${selected.join(', ')}) to paid?`,
+      modalConfirmText: 'Make Paid',
+      httpMethod: 'PATCH',
+      httpEndpointURL: '/api_orderanku/order/batch_paid',
+      httpPayload: {
+        order_ids: selected,
+      },
+    })
+  }
+
+  const handleBatchDelete = () => {
+    openConfirmModal({
+      modalTitle: 'Delete Orders',
+      modalText: `Are you sure you want to DELETE Order IDs (${selected.join(', ')})?`,
+      modalConfirmText: 'Delete',
+      httpMethod: 'DELETE-BATCH',
+      httpEndpointURL: '/api_orderanku/order/batch_delete',
+      httpPayload: {
+        order_ids: selected,
+      },
+    })
+  }
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const isItemSelected = isSelected(row.id)
-                const labelId = `enhanced-table-checkbox-${index}`
+    <>
+      <CCard className="mb-2">
+        <CCardBody>
+          <CContainer>
+            <CCardTitle>Filter</CCardTitle>
+            <CCardText>Hi</CCardText>
+          </CContainer>
+        </CCardBody>
+      </CCard>
+      <Box sx={{ width: '100%' }}>
+        <Paper sx={{ width: '100%', mb: 2 }}>
+          <EnhancedTableToolbar
+            numSelected={selected.length}
+            onBatchPrintClick={handleBatchPrint}
+            onBatchPaidClick={handleBatchPaid}
+            onBatchDeleteClick={handleBatchDelete}
+          />
+          <TableContainer>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={dense ? 'small' : 'medium'}
+            >
+              <EnhancedTableHead
+                numSelected={selected.length}
+                order={order}
+                orderBy={orderBy}
+                onSelectAllClick={handleSelectAllClick}
+                onRequestSort={handleRequestSort}
+                rowCount={userList.length}
+              />
+              <TableBody>
+                {visibleRows.map((row, index) => {
+                  const isItemSelected = isSelected(row.id)
+                  const labelId = `enhanced-table-checkbox-${index}`
 
-                return (
+                  return (
+                    <TableRow
+                      hover
+                      onClick={(event) => handleClick(event, row.id)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell component="th" id={labelId} scope="row" padding="none">
+                        {row.id}
+                      </TableCell>
+                      <TableCell>{formatDate(row.created_date)}</TableCell>
+                      <TableCell>{row.recipient_name}</TableCell>
+                      <TableCell>{truncateStr(row.recipient_address, 75)}</TableCell>
+                      <TableCell align="right">{formatCurrency(row.order_total)}</TableCell>
+                      <TableCell align="center">
+                        {row.print_date ? <CIcon icon={cilCheck} /> : '-'}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.paid_date ? <CIcon icon={cilCheck} /> : '-'}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+                {emptyRows > 0 && (
                   <TableRow
-                    hover
-                    onClick={(event) => handleClick(event, row.id)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: 'pointer' }}
+                    style={{
+                      height: (dense ? 33 : 53) * emptyRows,
+                    }}
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell component="th" id={labelId} scope="row" padding="none">
-                      {row.name}
-                    </TableCell>
-                    <TableCell align="right">{row.calories}</TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
-                    <TableCell align="right">{row.carbs}</TableCell>
-                    <TableCell align="right">{row.protein}</TableCell>
+                    <TableCell colSpan={8} />
                   </TableRow>
-                )
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 50]}
+            component="div"
+            count={userList.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={handleChangeDense} />}
+          label="Dense padding"
         />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
+      </Box>
+
+      <ConfirmationModal
+        isOpen={isConfirmModalVisible}
+        onClose={closeConfirmModal}
+        {...confirmModalData}
       />
-    </Box>
+    </>
   )
 }
