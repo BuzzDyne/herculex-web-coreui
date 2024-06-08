@@ -23,6 +23,9 @@ const OrderDetail = React.lazy(() => import('./views/pages/orderdetail/OrderDeta
 const BatchList = React.lazy(() => import('./views/pages/batchlist/BatchList'))
 const DocList = React.lazy(() => import('./views/pages/documentlist/DocumentList'))
 
+const OHome = React.lazy(() => import('./views/pages/orderanku/OHome'))
+const OReseller = React.lazy(() => import('./views/pages/orderanku/OReseller'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home', isPrivate: true },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard, isPrivate: true },
@@ -32,6 +35,10 @@ const routes = [
   { path: '/user_management', name: 'User Management', element: UserMgmt, isPrivate: true },
   { path: '/batch_list', name: 'BatchList', element: BatchList, isPrivate: true },
   { path: '/doc_list', name: 'Document List', element: DocList, isPrivate: true },
+
+  { path: '/orderku-home', name: 'Orderku Home', element: OHome, isPrivate: true },
+  { path: '/orderku-reseller', name: 'Orderku Reseller', element: OReseller, isPrivate: true },
+
   { path: '/icons', exact: true, name: 'Icons', element: CoreUIIcons, isPrivate: true },
   { path: '/icons/coreui-icons', name: 'CoreUI Icons', element: CoreUIIcons, isPrivate: true },
   { path: '/icons/flags', name: 'Flags', element: Flags, isPrivate: true },

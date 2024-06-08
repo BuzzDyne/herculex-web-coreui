@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilPrint, cilList, cilHome, cilGroup, cilNotes } from '@coreui/icons'
+import { cilPrint, cilList, cilHome, cilGroup, cilNotes, cilCart } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 export const nav_designer = [
@@ -76,6 +76,22 @@ export const nav_default = [
     name: 'Documents',
     to: '/doc_list',
     icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
+    name: 'Orderanku',
+  },
+  {
+    component: CNavItem,
+    name: 'Home',
+    to: '/orderku-home',
+    icon: <CIcon icon={cilHome} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Reseller List',
+    to: '/orderku-reseller',
+    icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
