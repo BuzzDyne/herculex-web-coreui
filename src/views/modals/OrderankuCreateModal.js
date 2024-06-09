@@ -388,6 +388,8 @@ const OrderankuCreateModal = (props) => {
               placeholder="Bank Name"
             />
           </CCol>
+        </CForm>
+        <CForm className="row g-3 mt-1" autoComplete="on">
           <CCol md={6}>
             <CFormInput
               invalid={formSNameErrMsg !== ''}
@@ -397,6 +399,8 @@ const OrderankuCreateModal = (props) => {
               value={formSName}
               onChange={handleSNameChange}
               placeholder="Seller Name"
+              name="hcx-seller-name"
+              autoComplete="name"
             />
           </CCol>
           <CCol md={6}>
@@ -404,10 +408,13 @@ const OrderankuCreateModal = (props) => {
               invalid={formSPhoneErrMsg !== ''}
               feedback={formSPhoneErrMsg}
               required
+              type="number"
               label="Seller Phone"
               value={formSPhone}
               onChange={handleSPhoneChange}
               placeholder="Seller Phone"
+              name="hcx-seller-phone"
+              autoComplete="tel"
             />
           </CCol>
         </CForm>
