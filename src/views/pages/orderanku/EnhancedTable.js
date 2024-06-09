@@ -29,6 +29,7 @@ import CIcon from '@coreui/icons-react'
 import { cilCheck } from '@coreui/icons'
 import { CCard, CCardBody, CCardText, CCardTitle, CContainer } from '@coreui/react'
 import ConfirmationModal from 'src/views/modals/ConfirmationModal'
+import OrderankuEditModal from 'src/views/modals/OrderankuEditModal'
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -89,7 +90,12 @@ const headCells = [
   { id: 'id', numeric: false, disablePadding: true, label: 'ID' },
   { id: 'created_date', numeric: false, disablePadding: false, label: 'Date' },
   { id: 'recipient_name', numeric: false, disablePadding: false, label: 'Recipient Name' },
-  { id: 'recipient_address', numeric: false, disablePadding: false, label: 'Recipient Address' },
+  {
+    id: 'recipient_address_display',
+    numeric: false,
+    disablePadding: false,
+    label: 'Recipient Address',
+  },
   { id: 'order_total', numeric: true, disablePadding: false, label: 'Order Total' },
   { id: 'print_flag', numeric: false, disablePadding: false, label: 'Print' },
   { id: 'paid_flag', numeric: false, disablePadding: false, label: 'Paid' },
@@ -151,7 +157,8 @@ EnhancedTableHead.propTypes = {
 }
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, onBatchPrintClick, onBatchPaidClick, onBatchDeleteClick } = props
+  const { numSelected, onBatchPrintClick, onBatchPaidClick, onBatchDeleteClick, onEditClick } =
+    props
 
   return (
     <Toolbar
@@ -178,7 +185,7 @@ function EnhancedTableToolbar(props) {
         <>
           {numSelected === 1 && (
             <Tooltip title="Edit">
-              <IconButton>
+              <IconButton onClick={onEditClick}>
                 <EditIcon />
               </IconButton>
             </Tooltip>
@@ -215,6 +222,7 @@ EnhancedTableToolbar.propTypes = {
   onBatchPrintClick: PropTypes.func.isRequired,
   onBatchPaidClick: PropTypes.func.isRequired,
   onBatchDeleteClick: PropTypes.func.isRequired,
+  onEditClick: PropTypes.func.isRequired,
 }
 
 const formatDate = (dateString) => {
@@ -223,7 +231,12 @@ const formatDate = (dateString) => {
 }
 
 const formatCurrency = (amount) => {
-  return amount.toLocaleString('en-US', { style: 'currency', currency: 'IDR' })
+  return amount.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })
 }
 
 const truncateStr = (text, limit) => {
@@ -237,13 +250,16 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0)
   const [dense, setDense] = React.useState(true)
   const [rowsPerPage, setRowsPerPage] = React.useState(10)
-  const [userList, setUserList] = React.useState([])
+  const [orderDataList, setOrderDataList] = React.useState([])
   const [visibleRows, setVisibleRows] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [axiosErrMsg, setAxiosErrMsg] = React.useState('')
 
   const [isConfirmModalVisible, setIsConfirmModalVisible] = React.useState(false)
   const [confirmModalData, setConfirmModalData] = React.useState({})
+
+  const [isEditModalVisible, setIsEditModalVisible] = React.useState(false)
+  const [editModalData, setEditModalData] = React.useState({})
 
   const axiosPrivate = useAxiosPrivate()
   React.useEffect(() => {
@@ -252,19 +268,19 @@ export default function EnhancedTable() {
 
   React.useEffect(() => {
     setVisibleRows(
-      stableSort(userList, getComparator(order, orderBy)).slice(
+      stableSort(orderDataList, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
       ),
     )
-  }, [userList, order, orderBy, page, rowsPerPage])
+  }, [orderDataList, order, orderBy, page, rowsPerPage])
 
   const fetchData = () => {
     setIsLoading(true)
     axiosPrivate
       .get('/api_orderanku/order?per_page=1000')
       .then((response) => {
-        setUserList(response.data.sellers) // Adjust to response data structure
+        setOrderDataList(response.data.sellers) // Adjust to response data structure
         console.log('Response.Data.Sellers:', response.data.sellers)
         setAxiosErrMsg('')
         setIsLoading(false)
@@ -272,7 +288,7 @@ export default function EnhancedTable() {
       .catch((err) => {
         console.error('Error fetching order list', err)
         setAxiosErrMsg(err.message)
-        setUserList([])
+        setOrderDataList([])
         setIsLoading(false)
       })
   }
@@ -285,7 +301,7 @@ export default function EnhancedTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = userList.map((n) => n.id)
+      const newSelected = orderDataList.map((n) => n.id)
       setSelected(newSelected)
       return
     }
@@ -327,15 +343,7 @@ export default function EnhancedTable() {
   const isSelected = (id) => selected.indexOf(id) !== -1
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - userList.length) : 0
-
-  if (isLoading) {
-    return <div>Loading...</div> // TODO Use Spinner
-  }
-
-  if (axiosErrMsg) {
-    return <div>Error: {axiosErrMsg}</div> // TODO Show Pretty Alert
-  }
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - orderDataList.length) : 0
 
   const openConfirmModal = (data) => {
     setConfirmModalData(data)
@@ -345,6 +353,19 @@ export default function EnhancedTable() {
   const closeConfirmModal = () => {
     setIsConfirmModalVisible(false)
     setConfirmModalData({})
+    setSelected([])
+    fetchData()
+  }
+
+  const openEditModal = () => {
+    console.log(`Inside EnhancedTable.openEditModal, selected: ${selected}`)
+    setEditModalData(orderDataList.find((o) => o.id === selected[0]))
+    setIsEditModalVisible(true)
+  }
+
+  const closeEditModal = () => {
+    setIsEditModalVisible(false)
+    setEditModalData({})
     setSelected([])
     fetchData()
   }
@@ -388,6 +409,18 @@ export default function EnhancedTable() {
     })
   }
 
+  const handleEdit = (row) => {
+    openEditModal()
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div> // TODO Use Spinner
+  }
+
+  if (axiosErrMsg) {
+    return <div>Error: {axiosErrMsg}</div> // TODO Show Pretty Alert
+  }
+
   return (
     <>
       <CCard className="mb-2">
@@ -405,6 +438,7 @@ export default function EnhancedTable() {
             onBatchPrintClick={handleBatchPrint}
             onBatchPaidClick={handleBatchPaid}
             onBatchDeleteClick={handleBatchDelete}
+            onEditClick={openEditModal}
           />
           <TableContainer>
             <Table
@@ -418,7 +452,7 @@ export default function EnhancedTable() {
                 orderBy={orderBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={userList.length}
+                rowCount={orderDataList.length}
               />
               <TableBody>
                 {visibleRows.map((row, index) => {
@@ -450,7 +484,7 @@ export default function EnhancedTable() {
                       </TableCell>
                       <TableCell>{formatDate(row.created_date)}</TableCell>
                       <TableCell>{row.recipient_name}</TableCell>
-                      <TableCell>{truncateStr(row.recipient_address, 65)}</TableCell>
+                      <TableCell>{truncateStr(row.recipient_address_display, 65)}</TableCell>
                       <TableCell align="right">{formatCurrency(row.order_total)}</TableCell>
                       <TableCell align="center">
                         {row.print_date ? <CIcon icon={cilCheck} /> : '-'}
@@ -476,7 +510,7 @@ export default function EnhancedTable() {
           <TablePagination
             rowsPerPageOptions={[10, 25, 50]}
             component="div"
-            count={userList.length}
+            count={orderDataList.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -493,6 +527,11 @@ export default function EnhancedTable() {
         isOpen={isConfirmModalVisible}
         onClose={closeConfirmModal}
         {...confirmModalData}
+      />
+      <OrderankuEditModal
+        isOpen={isEditModalVisible}
+        onClose={closeEditModal}
+        orderData={editModalData}
       />
     </>
   )

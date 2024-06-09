@@ -156,7 +156,7 @@ const ResellerEditModal = (props) => {
               label="Reseller Phone"
               value={formPhoneValue}
               onChange={handlePhoneChange}
-              placeholder="081123123123"
+              placeholder="Reseller Phone"
             />
           </CCol>
         </CForm>
