@@ -450,7 +450,7 @@ export default function EnhancedTable() {
                       </TableCell>
                       <TableCell>{formatDate(row.created_date)}</TableCell>
                       <TableCell>{row.recipient_name}</TableCell>
-                      <TableCell>{truncateStr(row.recipient_address, 75)}</TableCell>
+                      <TableCell>{truncateStr(row.recipient_address, 65)}</TableCell>
                       <TableCell align="right">{formatCurrency(row.order_total)}</TableCell>
                       <TableCell align="center">
                         {row.print_date ? <CIcon icon={cilCheck} /> : '-'}

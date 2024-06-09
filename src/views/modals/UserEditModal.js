@@ -125,7 +125,7 @@ const UserEditModal = ({ userData, isOpen, onClose }) => {
       await axiosPrivate.patch(`/api_user/id/${userData.id}`, payload)
     } catch (err) {
       console.error(err)
-      setFormSubmitErrorMsg(err)
+      setFormSubmitErrorMsg(err.message)
       return
     }
     closeSelf()
