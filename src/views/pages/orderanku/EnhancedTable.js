@@ -30,6 +30,7 @@ import { cilCheck } from '@coreui/icons'
 import { CCard, CCardBody, CCardText, CCardTitle, CContainer } from '@coreui/react'
 import ConfirmationModal from 'src/views/modals/ConfirmationModal'
 import OrderankuEditModal from 'src/views/modals/OrderankuEditModal'
+import OrderankuCreateModal from 'src/views/modals/OrderankuCreateModal'
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -157,8 +158,14 @@ EnhancedTableHead.propTypes = {
 }
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, onBatchPrintClick, onBatchPaidClick, onBatchDeleteClick, onEditClick } =
-    props
+  const {
+    numSelected,
+    onBatchPrintClick,
+    onBatchPaidClick,
+    onBatchDeleteClick,
+    onEditClick,
+    onCreateClick,
+  } = props
 
   return (
     <Toolbar
@@ -208,7 +215,7 @@ function EnhancedTableToolbar(props) {
         </>
       ) : (
         <Tooltip title="Add New Order">
-          <IconButton>
+          <IconButton onClick={onCreateClick}>
             <AddIcon /> {/* TODO Create Order*/}
           </IconButton>
         </Tooltip>
@@ -223,6 +230,7 @@ EnhancedTableToolbar.propTypes = {
   onBatchPaidClick: PropTypes.func.isRequired,
   onBatchDeleteClick: PropTypes.func.isRequired,
   onEditClick: PropTypes.func.isRequired,
+  onCreateClick: PropTypes.func.isRequired,
 }
 
 const formatDate = (dateString) => {
@@ -260,6 +268,8 @@ export default function EnhancedTable() {
 
   const [isEditModalVisible, setIsEditModalVisible] = React.useState(false)
   const [editModalData, setEditModalData] = React.useState({})
+
+  const [isCreateModalVisible, setIsCreateModalVisible] = React.useState(false)
 
   const axiosPrivate = useAxiosPrivate()
   React.useEffect(() => {
@@ -358,7 +368,6 @@ export default function EnhancedTable() {
   }
 
   const openEditModal = () => {
-    console.log(`Inside EnhancedTable.openEditModal, selected: ${selected}`)
     setEditModalData(orderDataList.find((o) => o.id === selected[0]))
     setIsEditModalVisible(true)
   }
@@ -366,6 +375,16 @@ export default function EnhancedTable() {
   const closeEditModal = () => {
     setIsEditModalVisible(false)
     setEditModalData({})
+    setSelected([])
+    fetchData()
+  }
+
+  const openCreateModal = () => {
+    setIsCreateModalVisible(true)
+  }
+
+  const closeCreateModal = () => {
+    setIsCreateModalVisible(false)
     setSelected([])
     fetchData()
   }
@@ -439,6 +458,7 @@ export default function EnhancedTable() {
             onBatchPaidClick={handleBatchPaid}
             onBatchDeleteClick={handleBatchDelete}
             onEditClick={openEditModal}
+            onCreateClick={openCreateModal}
           />
           <TableContainer>
             <Table
@@ -533,6 +553,7 @@ export default function EnhancedTable() {
         onClose={closeEditModal}
         orderData={editModalData}
       />
+      <OrderankuCreateModal isOpen={isCreateModalVisible} onClose={closeCreateModal} />
     </>
   )
 }
