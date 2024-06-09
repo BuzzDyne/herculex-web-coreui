@@ -26,8 +26,19 @@ import PriceCheckIcon from '@mui/icons-material/PriceCheck'
 import { visuallyHidden } from '@mui/utils'
 import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
 import CIcon from '@coreui/icons-react'
-import { cilCheck } from '@coreui/icons'
-import { CCard, CCardBody, CCardText, CCardTitle, CContainer } from '@coreui/react'
+import { cilCheck, cilSearch } from '@coreui/icons'
+import {
+  CButton,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CCardTitle,
+  CCol,
+  CFormInput,
+  CFormLabel,
+  CInputGroup,
+  CRow,
+} from '@coreui/react'
 import ConfirmationModal from 'src/views/modals/ConfirmationModal'
 import OrderankuEditModal from 'src/views/modals/OrderankuEditModal'
 import OrderankuCreateModal from 'src/views/modals/OrderankuCreateModal'
@@ -271,6 +282,12 @@ export default function EnhancedTable() {
 
   const [isCreateModalVisible, setIsCreateModalVisible] = React.useState(false)
 
+  const [filterRecipientName, setFilterRecipientName] = React.useState('')
+  const [filterRecipientPhone, setFilterRecipientPhone] = React.useState('')
+  const [filterRecipientAddr, setFilterRecipientAddr] = React.useState('')
+
+  const [lastFetchMode, setLastFetchMode] = React.useState('')
+
   const axiosPrivate = useAxiosPrivate()
   React.useEffect(() => {
     fetchData()
@@ -285,7 +302,52 @@ export default function EnhancedTable() {
     )
   }, [orderDataList, order, orderBy, page, rowsPerPage])
 
+  const shouldRefreshLastFetch = () => {
+    switch (lastFetchMode) {
+      case 'RNAME':
+        fetchDataFiltered(lastFetchMode, filterRecipientName)
+        break
+      case 'RPHONE':
+        fetchDataFiltered(lastFetchMode, filterRecipientPhone)
+        break
+      case 'RADDR':
+        fetchDataFiltered(lastFetchMode, filterRecipientAddr)
+        break
+      default:
+        fetchData()
+        break
+    }
+  }
+
+  const fetchDataFiltered = (key, value) => {
+    const queryMap = {
+      RNAME: `&recipient_name=${value}`,
+      RPHONE: `&recipient_phone=${value}`,
+      RADDR: `&recipient_addr=${value}`,
+    }
+
+    const query = queryMap[key] || ''
+
+    setIsLoading(true)
+    axiosPrivate
+      .get(`/api_orderanku/order?per_page=1000${query}`)
+      .then((response) => {
+        setOrderDataList(response.data.sellers) // Adjust to response data structure
+        console.log('Response.Data.Sellers:', response.data.sellers)
+        setAxiosErrMsg('')
+      })
+      .catch((err) => {
+        console.error('Error fetching order list', err)
+        setAxiosErrMsg(err.message)
+        setOrderDataList([])
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+
   const fetchData = () => {
+    setLastFetchMode('')
     setIsLoading(true)
     axiosPrivate
       .get('/api_orderanku/order?per_page=1000')
@@ -364,7 +426,7 @@ export default function EnhancedTable() {
     setIsConfirmModalVisible(false)
     setConfirmModalData({})
     setSelected([])
-    fetchData()
+    shouldRefreshLastFetch()
   }
 
   const openEditModal = () => {
@@ -376,7 +438,7 @@ export default function EnhancedTable() {
     setIsEditModalVisible(false)
     setEditModalData({})
     setSelected([])
-    fetchData()
+    shouldRefreshLastFetch()
   }
 
   const openCreateModal = () => {
@@ -386,7 +448,7 @@ export default function EnhancedTable() {
   const closeCreateModal = () => {
     setIsCreateModalVisible(false)
     setSelected([])
-    fetchData()
+    shouldRefreshLastFetch()
   }
 
   const handleBatchPrint = () => {
@@ -428,6 +490,31 @@ export default function EnhancedTable() {
     })
   }
 
+  const handelFilterClick = (key) => {
+    switch (key) {
+      case 'RNAME':
+        if (filterRecipientName && filterRecipientName.length > 0) {
+          setLastFetchMode(key)
+          fetchDataFiltered(key, filterRecipientName)
+        }
+        break
+      case 'RPHONE':
+        if (filterRecipientPhone && filterRecipientPhone.length > 0) {
+          setLastFetchMode(key)
+          fetchDataFiltered(key, filterRecipientPhone)
+        }
+        break
+      case 'RADDR':
+        if (filterRecipientAddr && filterRecipientAddr.length > 0) {
+          setLastFetchMode(key)
+          fetchDataFiltered(key, filterRecipientAddr)
+        }
+        break
+      default:
+        break
+    }
+  }
+
   const handleEdit = (row) => {
     openEditModal()
   }
@@ -443,11 +530,78 @@ export default function EnhancedTable() {
   return (
     <>
       <CCard className="mb-2">
+        <CCardHeader>
+          <CCardTitle>Filter Orderanku</CCardTitle>
+        </CCardHeader>
         <CCardBody>
-          <CContainer>
-            <CCardTitle>Filter</CCardTitle>
-            <CCardText>Hi</CCardText>
-          </CContainer>
+          <CRow>
+            <CCol xs={4}>
+              <CFormLabel>Recipient Name</CFormLabel>
+              <CInputGroup className="w-100">
+                <CFormInput
+                  style={{ boxShadow: '0 0 transparent' }}
+                  size="sm"
+                  placeholder="Filter Recipient Name"
+                  value={filterRecipientName}
+                  onChange={(e) => {
+                    setFilterRecipientName(e.target.value)
+                    setFilterRecipientPhone('')
+                    setFilterRecipientAddr('')
+                  }}
+                />
+                <CButton type="button" color="primary" onClick={() => handelFilterClick('RNAME')}>
+                  <CIcon icon={cilSearch} />
+                </CButton>
+              </CInputGroup>
+            </CCol>
+            <CCol xs={4}>
+              <CFormLabel>Recipient Phone</CFormLabel>
+              <CInputGroup className="w-100">
+                <CFormInput
+                  style={{ boxShadow: '0 0 transparent' }}
+                  size="sm"
+                  placeholder="Filter Recipient Phone"
+                  value={filterRecipientPhone}
+                  onChange={(e) => {
+                    // Allow only numeric input
+                    const input = e.target.value.replace(/\D/g, '')
+                    setFilterRecipientPhone(input)
+                    setFilterRecipientName('')
+                    setFilterRecipientAddr('')
+                  }}
+                />
+                <CButton type="button" color="primary" onClick={() => handelFilterClick('RPHONE')}>
+                  <CIcon icon={cilSearch} />
+                </CButton>
+              </CInputGroup>
+            </CCol>
+            <CCol xs={4}>
+              <CFormLabel>Recipient Address</CFormLabel>
+              <CInputGroup className="w-100">
+                <CFormInput
+                  style={{ boxShadow: '0 0 transparent' }}
+                  size="sm"
+                  placeholder="Filter Recipient Addr"
+                  value={filterRecipientAddr}
+                  onChange={(e) => {
+                    setFilterRecipientAddr(e.target.value)
+                    setFilterRecipientName('')
+                    setFilterRecipientPhone('')
+                  }}
+                />
+                <CButton type="button" color="primary" onClick={() => handelFilterClick('RADDR')}>
+                  <CIcon icon={cilSearch} />
+                </CButton>
+              </CInputGroup>
+            </CCol>
+          </CRow>
+          <CRow className="mt-1">
+            <CCol className="d-flex justify-content-end">
+              <CButton type="button" size="sm" color="secondary" onClick={fetchData}>
+                Clear Filters
+              </CButton>
+            </CCol>
+          </CRow>
         </CCardBody>
       </CCard>
       <Box sx={{ width: '100%' }}>
