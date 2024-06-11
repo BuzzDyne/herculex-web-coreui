@@ -276,6 +276,7 @@ const OrderankuCreateModal = (props) => {
 
   return (
     <CModal
+      backdrop="static"
       alignment="center"
       visible={isOpen}
       onClose={closeSelf}
