@@ -35,6 +35,7 @@ const OrderankuEditModal = (props) => {
   const [formRKec, setFormRKec] = useState('')
   const [formRKot, setFormRKot] = useState('')
   const [formRProv, setFormRProv] = useState('')
+  const [formRPost, setFormRPost] = useState('')
   const [formODetails, setFormODetails] = useState('')
   const [formOTotal, setFormOTotal] = useState(0)
   const [formOBank, setFormOBank] = useState('')
@@ -89,6 +90,7 @@ const OrderankuEditModal = (props) => {
     setFormRKec(orderData.recipient_kecamatan)
     setFormRKot(orderData.recipient_kota_kab)
     setFormRProv(orderData.recipient_provinsi)
+    setFormRPost(orderData.recipient_postal)
     setFormODetails(orderData.order_details)
     setFormOTotal(orderData.order_total)
     setFormOBank(orderData.order_bank)
@@ -113,6 +115,7 @@ const OrderankuEditModal = (props) => {
     setFormRKec('')
     setFormRKot('')
     setFormRProv('')
+    setFormRPost('')
     setFormODetails('')
     setFormOTotal('')
     setFormSName('')
@@ -272,6 +275,7 @@ const OrderankuEditModal = (props) => {
       const payload = {
         recipient_name: formRName,
         recipient_phone: formRPhone,
+        recipient_postal: formRPost,
         recipient_provinsi: formRProv,
         recipient_kota_kab: formRKot,
         recipient_kecamatan: formRKec,
@@ -339,10 +343,11 @@ const OrderankuEditModal = (props) => {
             />
           </CCol>
           <CCol md={12}>
-            <CFormInput
+            <CFormTextarea
               invalid={formRAddressErrMsg !== ''}
               feedback={formRAddressErrMsg}
               required
+              rows={3}
               label="Recipient Address"
               value={formRAddress}
               onChange={handleRAddressChange}
@@ -365,7 +370,7 @@ const OrderankuEditModal = (props) => {
               placeholder="Kecamatan"
             />
           </CCol>
-          <CCol md={6}>
+          <CCol md={12}>
             <CFormInput
               label="Kota/Kab"
               value={formRKot}
@@ -373,12 +378,20 @@ const OrderankuEditModal = (props) => {
               placeholder="Kota/Kab"
             />
           </CCol>
-          <CCol md={6}>
+          <CCol md={8}>
             <CFormInput
               label="Provinsi"
               value={formRProv}
               onChange={(e) => setFormRProv(e.target.value)}
               placeholder="Provinsi"
+            />
+          </CCol>
+          <CCol md={4}>
+            <CFormInput
+              label="Postal Code"
+              value={formRPost}
+              onChange={(e) => setFormRPost(e.target.value)}
+              placeholder="Postal Code"
             />
           </CCol>
           <CCol md={12}>
@@ -387,7 +400,7 @@ const OrderankuEditModal = (props) => {
               feedback={formODetailsErrMsg}
               required
               label="Order Detail"
-              rows={5}
+              rows={3}
               value={formODetails}
               onChange={handleODetailsChange}
               placeholder="Product A (1x)"
