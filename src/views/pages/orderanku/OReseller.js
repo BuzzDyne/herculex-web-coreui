@@ -41,7 +41,7 @@ const OReseller = () => {
   const fetchData = () => {
     setIsLoading(true)
     axiosPrivate
-      .get('/api_orderanku/seller?per_page=1000')
+      .get('/api_orderanku/seller?sort_field=id&sort_order=asc&per_page=5000')
       .then((response) => {
         setResellerList(response.data.sellers)
         setAxiosErrMsg('')

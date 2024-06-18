@@ -3,6 +3,7 @@ import {
   CAlert,
   CButton,
   CCol,
+  CCollapse,
   CForm,
   CFormInput,
   CFormLabel,
@@ -12,7 +13,9 @@ import {
   CModalFooter,
   CModalHeader,
   CModalTitle,
+  CRow,
   CSpinner,
+  CTooltip,
 } from '@coreui/react'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import { Autocomplete, TextField } from '@mui/material'
@@ -43,7 +46,7 @@ const OrderankuCreateModal = (props) => {
   const [formSName, setFormSName] = useState('')
   const [formSPhone, setFormSPhone] = useState('')
 
-  const [formSubmitErrorMsg, setformSubmitErrorMsg] = useState('')
+  const [formSubmitErrorMsg, setFormSubmitErrorMsg] = useState('')
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -52,7 +55,14 @@ const OrderankuCreateModal = (props) => {
   const [sellerOptions, setSellerOptions] = useState([
     { seller_name: 'Herculex Indonesia', seller_phone: '081387496006' },
   ])
-  const defaultSeller = sellerOptions.find((opt) => opt.seller_name === 'Herculex Indonesia')
+  // const defaultSeller = sellerOptions.find((opt) => opt.id === 'Herculex Indonesiax')
+  const defaultSeller = sellerOptions[sellerOptions.length - 1]
+
+  const [isCollapsed, setIsCollapsed] = useState(true)
+  const [isCopiedTooltipVisible, setIsCopiedTooltipVisible] = useState(false)
+  const [isCopasTooltipVisible, setIsCopasTooltipVisible] = useState(false)
+  const [formCopasValue, setFormCopasValue] = useState('')
+  const [formCopasErrMsg, setFormCopasErrMsg] = useState('')
 
   const getSellerOpts = async () => {
     try {
@@ -260,11 +270,115 @@ const OrderankuCreateModal = (props) => {
       await axiosPrivate.post(`/api_orderanku/order`, payload)
     } catch (err) {
       console.error(err)
-      setformSubmitErrorMsg(err.message)
+      setFormSubmitErrorMsg(err.message)
       setIsLoading(false)
       return
     }
     closeSelf()
+  }
+
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText('Nama: \nAlamat: \nKel: \nKec: \nKota: \nProvinsi: \nKode Pos: \nTelp: ')
+      .then(() => {
+        setIsCopiedTooltipVisible(true)
+        setTimeout(() => setIsCopiedTooltipVisible(false), 1000)
+      })
+      .catch((error) => {
+        console.error('Error copying to clipboard:', error)
+      })
+  }
+
+  const handleCopasSubmit = () => {
+    let isValid = true
+    setFormCopasErrMsg('')
+
+    if (formCopasValue) {
+      const lines = formCopasValue.split('\n')
+      console.log(`lines: ${lines}`)
+
+      const nameLine = lines.find((line) => line.startsWith('Nama:'))
+      const addressLine = lines.find((line) => line.startsWith('Alamat:'))
+      const kelLine = lines.find((line) => line.startsWith('Kel:'))
+      const kecLine = lines.find((line) => line.startsWith('Kec:'))
+      const kotLine = lines.find((line) => line.startsWith('Kota:'))
+      const provLine = lines.find((line) => line.startsWith('Provinsi:'))
+      const postLine = lines.find((line) => line.startsWith('Kode Pos:'))
+      const phoneLine = lines.find((line) => line.startsWith('Telp:'))
+
+      console.log(`nameLine: ${nameLine}`)
+      console.log(`addressLine: ${addressLine}`)
+      console.log(`kelLine: ${kelLine}`)
+      console.log(`kecLine: ${kecLine}`)
+      console.log(`kotLine: ${provLine}`)
+      console.log(`provLine: ${provLine}`)
+      console.log(`postLine: ${postLine}`)
+      console.log(`phoneLine: ${phoneLine}`)
+
+      if (nameLine) {
+        setFormRName(nameLine.replace('Nama:', '').trim())
+      } else {
+        setFormCopasErrMsg('Name line is missing or incorrect')
+        isValid = false
+      }
+
+      if (addressLine) {
+        setFormRAddress(addressLine.replace('Alamat:', '').trim())
+      } else {
+        setFormCopasErrMsg('Address line is missing or incorrect')
+        isValid = false
+      }
+
+      if (kelLine) {
+        setFormRKel(kelLine.replace('Kel:', '').trim())
+      } else {
+        setFormCopasErrMsg('Kelurahan line is missing or incorrect')
+        isValid = false
+      }
+
+      if (kecLine) {
+        setFormRKec(kecLine.replace('Kec:', '').trim())
+      } else {
+        setFormCopasErrMsg('Kecamatan line is missing or incorrect')
+        isValid = false
+      }
+
+      if (kotLine) {
+        setFormRKot(kotLine.replace('Kota:', '').trim())
+      } else {
+        setFormCopasErrMsg('Kota/Kab line is missing or incorrect')
+        isValid = false
+      }
+
+      if (provLine) {
+        setFormRProv(provLine.replace('Provinsi:', '').trim())
+      } else {
+        setFormCopasErrMsg('Provinsi line is missing or incorrect')
+        isValid = false
+      }
+
+      if (postLine) {
+        setFormRPost(postLine.replace('Kode Pos:', '').trim())
+      } else {
+        setFormCopasErrMsg('Postal code line is missing or incorrect')
+        isValid = false
+      }
+
+      if (phoneLine) {
+        setFormRPhone(phoneLine.replace('Telp:', '').trim())
+      } else {
+        setFormCopasErrMsg('Phone line is missing or incorrect')
+        isValid = false
+      }
+
+      if (isValid) {
+        setIsCopasTooltipVisible(true) // Show the success tooltip
+        setTimeout(() => setIsCopasTooltipVisible(false), 1000) // Hide the success tooltip after 2 seconds
+      }
+    } else {
+      isValid = false
+      setFormCopasErrMsg('Input cannot be empty.')
+    }
   }
 
   return (
@@ -286,6 +400,54 @@ const OrderankuCreateModal = (props) => {
             {formSubmitErrorMsg}
           </CAlert>
         )}
+
+        <CCollapse visible={!isCollapsed} className="mb-3 mt-0">
+          <CRow>
+            <CCol md={9}>
+              <CFormTextarea
+                rows={9}
+                placeholder="Copy Here"
+                invalid={formCopasErrMsg !== ''}
+                feedback={formCopasErrMsg}
+                onChange={(e) => {
+                  setFormCopasErrMsg('')
+                  setFormCopasValue(e.target.value)
+                }}
+              />
+            </CCol>
+            <CCol md={3} className="d-grid">
+              <div className="d-flex flex-column flex-md-column flex-sm-row gap-2">
+                <CTooltip content="Copied!" visible={isCopiedTooltipVisible} trigger={['focus']}>
+                  <CButton
+                    color="dark"
+                    className="w-100 w-md-auto flex-grow-1"
+                    onClick={handleCopy}
+                  >
+                    Copy Template
+                  </CButton>
+                </CTooltip>
+                <CTooltip content="Success!" visible={isCopasTooltipVisible} trigger={[]}>
+                  <CButton
+                    color="success"
+                    className="w-100 w-md-auto flex-grow-1"
+                    onClick={handleCopasSubmit}
+                  >
+                    Submit
+                  </CButton>
+                </CTooltip>
+              </div>
+            </CCol>
+          </CRow>
+        </CCollapse>
+        <CCol md={12} className="d-grid mb-3">
+          <CButton
+            onClick={() => {
+              setIsCollapsed(!isCollapsed)
+            }}
+          >
+            {isCollapsed ? 'Open QuickFill' : 'Close QuickFill'}
+          </CButton>
+        </CCol>
 
         <CForm className="row g-3">
           <CCol md={6}>
