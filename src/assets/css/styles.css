@@ -6,3 +6,37 @@
   /* Hovered box shadow */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
+
+.textField {
+}
+
+.textField .MuiInputBase-input {
+}
+
+.textField .MuiInput-underline::before {
+  border-bottom: 1px solid #ccc;
+}
+
+.textField .MuiInput-underline:hover::before {
+  border-bottom: 2px solid #000;
+}
+
+.textField .MuiInput-underline::after {
+  border-bottom: 2px solid #3f51b5;
+}
+
+.placeholder {
+  color: #999;
+}
+
+.invalid .MuiOutlinedInput-root {
+  border-color: red;
+}
+
+.invalid .MuiOutlinedInput-notchedOutline {
+  border-color: red;
+}
+
+.invalid .MuiFormHelperText-root {
+  color: red;
+}

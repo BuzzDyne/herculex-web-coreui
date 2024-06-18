@@ -4,8 +4,8 @@ import {
   CButton,
   CCol,
   CForm,
-  CFormCheck,
   CFormInput,
+  CFormLabel,
   CFormTextarea,
   CModal,
   CModalBody,
@@ -15,7 +15,8 @@ import {
   CSpinner,
 } from '@coreui/react'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
-import { Autocomplete, TextField, Typography } from '@mui/material'
+import { Autocomplete, TextField } from '@mui/material'
+import 'src/assets/css/styles.css'
 
 const OrderankuCreateModal = (props) => {
   const { isOpen, onClose } = props
@@ -48,37 +49,26 @@ const OrderankuCreateModal = (props) => {
 
   const axiosPrivate = useAxiosPrivate()
 
-  // AutoComplete
+  const [sellerOptions, setSellerOptions] = useState([
+    { seller_name: 'Herculex Indonesia', seller_phone: '081387496006' },
+  ])
+  const defaultSeller = sellerOptions.find((opt) => opt.seller_name === 'Herculex Indonesia')
 
-  // const [sellerOptions, setSellerOptions] = useState([])
-  // const [selectedSeller, setSelectedSeller] = useState({ id: 0, seller_name: '', seller_phone: '' })
+  const getSellerOpts = async () => {
+    try {
+      console.log('Gettting List of Sellers...')
+      const res = await axiosPrivate.get(`/api_orderanku/seller?per_page=5000`)
+      setSellerOptions(res.data.sellers)
+      console.log(res.data.sellers)
+    } catch (error) {
+      console.error('API call failed:', error)
+      setSellerOptions([])
+    }
+  }
 
-  // const getSellerOpts = async () => {
-  //   try {
-  //     const res = await axiosPrivate.get(`/api_orderanku/seller?per_page=5000`)
-  //     setSellerOptions(res.data.sellers)
-  //   } catch (error) {
-  //     console.error('API call failed:', error)
-  //     setSellerOptions([])
-  //   }
-  // }
-  // const handleSelectSeller = (event, newValue) => {
-  //   if (newValue) {
-  //     setSelectedSeller(newValue)
-  //   } else {
-  //     setSelectedSeller({ id: 0, seller_name: '', seller_phone: '' })
-  //   }
-  // }
-
-  // const renderOption = (props, option) => (
-  //   <li {...props}>
-  //     <Typography component="span" fontWeight="bold">
-  //       {option.seller_name}
-  //     </Typography>
-  //     {' - '}
-  //     <Typography component="span">{option.seller_phone}</Typography>
-  //   </li>
-  // )
+  useEffect(() => {
+    getSellerOpts()
+  }, [isOpen])
 
   const closeSelf = () => {
     onClose()
@@ -401,9 +391,41 @@ const OrderankuCreateModal = (props) => {
               placeholder="Bank Name"
             />
           </CCol>
-        </CForm>
-        <CForm className="row g-3 mt-1" autoComplete="on">
           <CCol md={6}>
+            <CFormLabel>Seller Name</CFormLabel>
+            <Autocomplete
+              freeSolo
+              options={sellerOptions}
+              getOptionLabel={(opt) => opt.seller_name}
+              renderOption={(props, opt) => (
+                <li {...props}>
+                  <div>
+                    <strong>{opt.seller_name}</strong> - <small>{opt.seller_phone}</small>
+                  </div>
+                </li>
+              )}
+              onInputChange={(event, value) => {
+                setFormSNameErrMsg('')
+                setFormSName(value)
+                const selectedOption = sellerOptions.find((opt) => opt.seller_name === value)
+                if (selectedOption) {
+                  setFormSPhone(selectedOption.seller_phone)
+                }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Seller Name"
+                  InputLabelProps={{ shrink: false }}
+                  helperText={formSNameErrMsg}
+                  className={`textField ${formSNameErrMsg !== '' ? 'invalid' : ''}`}
+                />
+              )}
+              size="small"
+              defaultValue={defaultSeller}
+            />
+          </CCol>
+          {/* <CCol md={6}>
             <CFormInput
               invalid={formSNameErrMsg !== ''}
               feedback={formSNameErrMsg}
@@ -415,7 +437,7 @@ const OrderankuCreateModal = (props) => {
               name="hcx-seller-name"
               autoComplete="name"
             />
-          </CCol>
+          </CCol> */}
           <CCol md={6}>
             <CFormInput
               invalid={formSPhoneErrMsg !== ''}
