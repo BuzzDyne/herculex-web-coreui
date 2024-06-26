@@ -20,6 +20,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import PrintIcon from '@mui/icons-material/Print'
 import PriceCheckIcon from '@mui/icons-material/PriceCheck'
@@ -42,6 +43,7 @@ import {
 import ConfirmationModal from 'src/views/modals/ConfirmationModal'
 import OrderankuEditModal from 'src/views/modals/OrderankuEditModal'
 import OrderankuCreateModal from 'src/views/modals/OrderankuCreateModal'
+import OrderankuViewModal from 'src/views/modals/OrderankuViewModal'
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -175,6 +177,7 @@ function EnhancedTableToolbar(props) {
     onBatchPaidClick,
     onBatchDeleteClick,
     onEditClick,
+    onViewClick,
     onCreateClick,
   } = props
 
@@ -202,11 +205,18 @@ function EnhancedTableToolbar(props) {
       {numSelected > 0 ? (
         <>
           {numSelected === 1 && (
-            <Tooltip title="Edit">
-              <IconButton onClick={onEditClick}>
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
+            <>
+              <Tooltip title="View">
+                <IconButton onClick={onViewClick}>
+                  <VisibilityIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Edit">
+                <IconButton onClick={onEditClick}>
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+            </>
           )}
           <Tooltip title="Print">
             <IconButton onClick={onBatchPrintClick}>
@@ -241,6 +251,7 @@ EnhancedTableToolbar.propTypes = {
   onBatchPaidClick: PropTypes.func.isRequired,
   onBatchDeleteClick: PropTypes.func.isRequired,
   onEditClick: PropTypes.func.isRequired,
+  onViewClick: PropTypes.func.isRequired,
   onCreateClick: PropTypes.func.isRequired,
 }
 
@@ -279,6 +290,9 @@ export default function EnhancedTable() {
 
   const [isEditModalVisible, setIsEditModalVisible] = React.useState(false)
   const [editModalData, setEditModalData] = React.useState({})
+
+  const [isViewModalVisible, setIsViewModalVisible] = React.useState(false)
+  const [viewModalData, setViewModalData] = React.useState({})
 
   const [isCreateModalVisible, setIsCreateModalVisible] = React.useState(false)
 
@@ -441,6 +455,18 @@ export default function EnhancedTable() {
     shouldRefreshLastFetch()
   }
 
+  const openViewModal = () => {
+    setViewModalData(orderDataList.find((o) => o.id === selected[0]))
+    setIsViewModalVisible(true)
+  }
+
+  const closeViewModal = () => {
+    setIsViewModalVisible(false)
+    setViewModalData({})
+    // setSelected([])
+    // shouldRefreshLastFetch()
+  }
+
   const openCreateModal = () => {
     setIsCreateModalVisible(true)
   }
@@ -513,10 +539,6 @@ export default function EnhancedTable() {
       default:
         break
     }
-  }
-
-  const handleEdit = (row) => {
-    openEditModal()
   }
 
   if (isLoading) {
@@ -612,6 +634,7 @@ export default function EnhancedTable() {
             onBatchPaidClick={handleBatchPaid}
             onBatchDeleteClick={handleBatchDelete}
             onEditClick={openEditModal}
+            onViewClick={openViewModal}
             onCreateClick={openCreateModal}
           />
           <TableContainer>
@@ -706,6 +729,11 @@ export default function EnhancedTable() {
         isOpen={isEditModalVisible}
         onClose={closeEditModal}
         orderData={editModalData}
+      />
+      <OrderankuViewModal
+        isOpen={isViewModalVisible}
+        onClose={closeViewModal}
+        orderData={viewModalData}
       />
       <OrderankuCreateModal isOpen={isCreateModalVisible} onClose={closeCreateModal} />
     </>
