@@ -15,6 +15,7 @@ import {
   CSpinner,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
+import { HTTP_409_CONFLICT } from 'src/constant'
 import useAuth from 'src/hooks/useAuth'
 import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
 
@@ -40,6 +41,7 @@ const OrderPICToMe = ({ isOpen, onClose, orderData }) => {
       .patch(`/api_order/id/${orderData.id}/update_pic`, {
         user_id: auth.token_user_id,
         pic_id: auth.token_user_id,
+        old_pic_id: orderData.pic_user_id,
       })
       .then((response) => {
         // console.log('Submission successful', response.data)
@@ -48,7 +50,12 @@ const OrderPICToMe = ({ isOpen, onClose, orderData }) => {
       })
       .catch((error) => {
         console.error('Error submitting data', error)
-        setFormSubmitErrorMsg('Error submitting data.')
+        console.log(error.response.status)
+        if (error.response.status == HTTP_409_CONFLICT) {
+          setFormSubmitErrorMsg(error.response.data.detail)
+        } else {
+          setFormSubmitErrorMsg('Error submitting data.')
+        }
         setIsLoading(false) // Set isLoading to false
       })
   }

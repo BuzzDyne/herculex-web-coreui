@@ -17,6 +17,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import useAuth from 'src/hooks/useAuth'
 import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
+import { HTTP_409_CONFLICT } from 'src/constant'
 
 const OrderPICManage = ({ isOpen, onClose, orderData }) => {
   const { auth } = useAuth()
@@ -83,6 +84,7 @@ const OrderPICManage = ({ isOpen, onClose, orderData }) => {
       .patch(`/api_order/id/${orderData.id}/update_pic`, {
         user_id: auth.token_user_id,
         pic_id: picId,
+        old_pic_id: orderData.pic_user_id,
       })
       .then((response) => {
         // console.log('Submission successful', response.data)
@@ -91,7 +93,12 @@ const OrderPICManage = ({ isOpen, onClose, orderData }) => {
       })
       .catch((error) => {
         console.error('Error submitting data', error)
-        setFormSubmitErrorMsg('Error submitting data.')
+        console.log(error.response.status)
+        if (error.response.status == HTTP_409_CONFLICT) {
+          setFormSubmitErrorMsg(error.response.data.detail)
+        } else {
+          setFormSubmitErrorMsg('Error submitting data.')
+        }
         setIsLoading(false) // Set isLoading to false
       })
   }

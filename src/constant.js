@@ -29,3 +29,5 @@ export const DocModalTypes = {
   CREATE_QUOTATION: 'CREATE_QUOTATION',
   CREATE_MANUAL: 'CREATE_MANUAL',
 }
+
+export const HTTP_409_CONFLICT = 409
