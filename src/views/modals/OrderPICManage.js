@@ -93,7 +93,6 @@ const OrderPICManage = ({ isOpen, onClose, orderData }) => {
       })
       .catch((error) => {
         console.error('Error submitting data', error)
-        console.log(error.response.status)
         if (error.response.status == HTTP_409_CONFLICT) {
           setFormSubmitErrorMsg(error.response.data.detail)
         } else {

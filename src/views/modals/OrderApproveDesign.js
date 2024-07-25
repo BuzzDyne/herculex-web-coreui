@@ -9,6 +9,7 @@ import {
   CSpinner,
 } from '@coreui/react'
 import React, { useState } from 'react'
+import { HTTP_409_CONFLICT } from 'src/constant'
 import useAuth from 'src/hooks/useAuth'
 import useAxiosPrivate from 'src/hooks/useAxiosPrivate'
 
@@ -42,7 +43,11 @@ const OrderApproveDesign = ({ isOpen, onClose, orderData }) => {
       })
       .catch((error) => {
         console.error('Error submitting data', error)
-        setFormSubmitErrorMsg('Error submitting data.')
+        if (error.response.status == HTTP_409_CONFLICT) {
+          setFormSubmitErrorMsg(error.response.data.detail)
+        } else {
+          setFormSubmitErrorMsg('Error submitting data.')
+        }
         setIsLoading(false) // Set isLoading to false
       })
   }

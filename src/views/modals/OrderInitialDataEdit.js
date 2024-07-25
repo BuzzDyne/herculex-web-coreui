@@ -151,6 +151,7 @@ const OrderInitialDataEdit = ({ isOpen, onClose, orderData }) => {
         cust_phone_no: formCustPhoneValue,
         user_deadline_prd: dateStr,
         user_id: auth.token_user_id,
+        check_stale: false,
       })
       .then((response) => {
         // console.log('Submission successful', response.data)

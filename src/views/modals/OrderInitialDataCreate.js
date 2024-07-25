@@ -19,6 +19,7 @@ import React, { useEffect, useState } from 'react'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useAuth from '../../hooks/useAuth'
 import { isYYYYMMDDInvalid } from 'src/utils'
+import { HTTP_409_CONFLICT } from 'src/constant'
 
 const OrderInitialDataCreate = ({ isOpen, onClose, orderID }) => {
   const { auth } = useAuth()
@@ -174,6 +175,7 @@ const OrderInitialDataCreate = ({ isOpen, onClose, orderID }) => {
         user_deadline_prd: dateStr,
         user_id: auth.token_user_id,
         pic_user_id: picId,
+        check_stale: true,
       })
       .then((response) => {
         // console.log('Submission successful', response.data)
@@ -182,7 +184,11 @@ const OrderInitialDataCreate = ({ isOpen, onClose, orderID }) => {
       })
       .catch((error) => {
         console.error('Error submitting data', error)
-        setFormSubmitErrorMsg('Error submitting data.')
+        if (error.response.status == HTTP_409_CONFLICT) {
+          setFormSubmitErrorMsg(error.response.data.detail)
+        } else {
+          setFormSubmitErrorMsg('Error submitting data.')
+        }
         setIsLoading(false) // Set isLoading to false
       })
   }
