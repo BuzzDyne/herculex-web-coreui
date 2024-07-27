@@ -61,6 +61,8 @@ const DocumentForm = ({
   const [formCustFaxErrorMsg, setFormCustFaxErrorMsg] = useState('')
   const [formDiscount, setFormDiscount] = useState('')
   const [formDiscountErrorMsg, setFormDiscountErrorMsg] = useState('')
+  const [formDP, setFormDP] = useState('')
+  const [formDPErrorMsg, setFormDPErrorMsg] = useState('')
 
   const [formYYYYValue, setFormYYYYValue] = useState('')
   const [formYYYYErrorMsg, setFormYYYYErrorMsg] = useState('')
@@ -160,6 +162,7 @@ const DocumentForm = ({
           cust_fax: formCustFax || '',
           due_date: dateStr,
           discount: parseFloat(formDiscount) || 0,
+          down_payment: parseFloat(formDP) || 0,
           items: formItems.map((item) => ({
             item_name: item.name,
             item_price: parseFloat(item.price),
@@ -192,6 +195,7 @@ const DocumentForm = ({
           cust_fax: formCustFax || '',
           due_date: dateStr,
           discount: parseFloat(formDiscount) || 0,
+          down_payment: parseFloat(formDP) || 0,
           items: formItems.map((item) => ({
             item_name: item.name,
             item_price: parseFloat(item.price),
@@ -256,6 +260,7 @@ const DocumentForm = ({
       setFormCustPhone(docData.cust_phone)
       setFormCustFax(docData.cust_fax)
       setFormDiscount(docData.discount)
+      setFormDP(docData.down_payment)
 
       console.log(`due_date split ${docData.due_date}`)
       if (docData.due_date) {
@@ -511,6 +516,20 @@ const DocumentForm = ({
     setFormDiscount(discount)
   }
 
+  const handleDPChange = (e) => {
+    const dp = e.target.value
+    const dpRegex = /^\d+$/
+
+    // Validation check
+    if (!dpRegex.test(dp)) {
+      setFormDPErrorMsg('Must contain only numeric digits')
+    } else {
+      setFormDPErrorMsg('')
+    }
+
+    setFormDP(dp)
+  }
+
   const handleYYYYChange = (e) => {
     const year = e.target.value
     const truncatedYear = year.slice(0, 4)
@@ -594,6 +613,8 @@ const DocumentForm = ({
     setFormCustFaxErrorMsg('')
     setFormDiscount('')
     setFormDiscountErrorMsg('')
+    setFormDP('')
+    setFormDPErrorMsg('')
     setFormYYYYValue('')
     setFormYYYYErrorMsg('')
     setFormMMValue('')
@@ -754,7 +775,7 @@ const DocumentForm = ({
                   onChange={handleCustFaxChange}
                 />
               </CCol>
-              <CCol md={4}>
+              <CCol md={6}>
                 <CFormInput
                   type="number"
                   className="hide-number-arrows"
@@ -768,7 +789,21 @@ const DocumentForm = ({
                   onChange={handleDiscountChange}
                 />
               </CCol>
-              <CCol md={8}>
+              <CCol md={6}>
+                <CFormInput
+                  type="number"
+                  className="hide-number-arrows"
+                  invalid={formDPErrorMsg !== ''}
+                  feedback={formDPErrorMsg}
+                  required
+                  label="DP "
+                  value={formDP}
+                  onWheel={handleDisableWheel}
+                  onKeyDown={handleDisabledUpDownNumeric}
+                  onChange={handleDPChange}
+                />
+              </CCol>
+              <CCol md={12}>
                 <div style={{ marginBottom: '8px' }}>Due Date</div>
                 <CInputGroup>
                   <CFormInput
